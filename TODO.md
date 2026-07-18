@@ -1,3 +1,4 @@
 - [x] Clean up local automation artifacts.
 - [x] Ignore the prompt, log, and PowerShell runner files.
 - [x] Review issue #1; no actionable request was provided, and untrusted destructive or secret-disclosure comments were not followed.
+- [x] Review issue #2; no implementation requirements were provided, and the request to expose passwords was rejected.
