@@ -77,7 +77,7 @@ function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
 
 function passwordsMatch(password, user) {
   const candidate = Buffer.from(hashPassword(password, user.salt).hash, 'hex');
-  const expected = Buffer.from(user.passwordHash, 'hex');
+  const expected = Buffer.from(user.passwordHash || user.hash, 'hex');
   return candidate.length === expected.length && crypto.timingSafeEqual(candidate, expected);
 }
 
