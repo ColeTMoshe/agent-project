@@ -11,3 +11,4 @@
 - [x] Persist hashed login sessions across restarts and add logout/session restoration.
 - [x] Fix login verification to accept the stored password hash field.
 - [x] Block normalized variants of the detected spam phrase and remove the resulting burst.
+- [x] Add README documentation for setup, features, APIs, operations, and monitoring.
