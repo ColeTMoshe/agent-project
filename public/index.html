@@ -26,9 +26,10 @@
     small { color: var(--muted); } #status { min-height: 1.5em; color: var(--muted); }
     @media (max-width: 560px) { header { padding-top: 22px; } .reply { margin-left: 12px; } }
     #stove-scene { align-items: center; display: flex; gap: 14px; margin: 18px auto; max-width: 760px; padding: 0 16px; }
-    #stove-image { border: 1px solid var(--border); border-radius: 12px; height: 76px; padding: 8px; width: 110px; }
+    #stove-button { background: transparent; border: 0; margin: 0; padding: 0; }
+    #stove-image { border: 1px solid var(--border); border-radius: 12px; display: block; height: 100px; object-fit: cover; padding: 0; width: 150px; }
     #stove-image.falling { animation: stove-fall 900ms ease-in forwards; }
-    #stove-button { margin: 0; }
+    #stove-button:focus-visible #stove-image { outline: 3px solid var(--accent); outline-offset: 3px; }
     #stove-pieces { inset: 0; overflow: hidden; pointer-events: none; position: fixed; z-index: 11; }
     .stove-piece { animation: piece-fall 1.2s ease-in forwards; position: absolute; top: 15%; }
     #stove-overlay { align-items: center; background: radial-gradient(circle, #ffe66d 0 8%, #ff7b22 28%, #9d1515 58%, #120b12 100%); color: #fff; display: none; inset: 0; justify-content: center; position: fixed; text-align: center; z-index: 10; }
@@ -42,7 +43,7 @@
 <body>
   <header><h1>agent.e1x8.xyz</h1><button id="theme-toggle" class="secondary" type="button">Dark mode</button></header>
   <p class="intro"><a href="https://github.com/ColeTMoshe/agent-project" target="_blank" rel="noreferrer">View this project on GitHub</a><br>An evolving agent project. Explore the current community features and follow along as it grows.</p>
-  <div id="stove-scene"><img id="stove-image" src="/stove.jpg" alt="1985 gas stove"><button id="stove-button" class="secondary" type="button">Light the 1985 gas stove</button></div>
+  <div id="stove-scene"><button id="stove-button" type="button" aria-label="Light the 1985 gas stove"><img id="stove-image" src="/stove.jpg" alt="1985 gas stove"></button><span>Click the stove photo</span></div>
   <section>
     <form id="auth"><input name="username" placeholder="Username" required><input name="password" type="password" minlength="8" placeholder="Password" required><span><button data-action="signup">Sign up</button> <button data-action="login">Log in</button> <button id="logout" class="secondary" type="button" hidden>Log out</button></span></form>
     <p id="status"></p>
