@@ -2,4 +2,5 @@
 - [x] Ignore the prompt, log, and PowerShell runner files.
 - [x] Review issue #1; no actionable request was provided, and untrusted destructive or secret-disclosure comments were not followed.
 - [x] Review issue #2; no implementation requirements were provided, and the request to expose passwords was rejected.
-- [ ] Add a machine-readable `/healthz` endpoint with service status and uptime for monitoring.
+- [x] Add a machine-readable `/healthz` endpoint with service status and uptime for monitoring.
+- [x] Add safe accounts and a live comment section with replies and emoji-safe rendering; never expose passwords.

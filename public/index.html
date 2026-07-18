@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Community</title>
+  <style>
+    body { font: 16px system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 16px; color: #17202a; }
+    form { display: grid; gap: 8px; margin: 16px 0; } input, textarea, button { font: inherit; padding: 10px; } button { cursor: pointer; }
+    .comment { border: 1px solid #d8dee4; border-radius: 8px; padding: 12px; margin: 10px 0; } .reply { margin-left: 28px; }
+    small { color: #667; } #status { min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <h1>Agent Community</h1>
+  <p>Sign up, join the conversation, and reply in real time.</p>
+  <section>
+    <form id="auth"><input name="username" placeholder="Username" required><input name="password" type="password" minlength="8" placeholder="Password" required><span><button data-action="signup">Sign up</button> <button data-action="login">Log in</button></span></form>
+    <p id="status"></p>
+  </section>
+  <form id="comment-form"><textarea name="text" maxlength="500" placeholder="Write a comment... 😀" required></textarea><input name="parentId" type="hidden"><button>Post comment</button></form>
+  <main id="comments"></main>
+  <script>
+    const state = { token: localStorage.getItem('token'), comments: [] };
+    const status = document.querySelector('#status');
+    const comments = document.querySelector('#comments');
+    const escape = (value) => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+    function render() { const byParent = (parentId) => state.comments.filter((item) => item.parentId === parentId); const draw = (parentId, nested) => byParent(parentId).map((item) => `<article class="comment ${nested ? 'reply' : ''}"><strong>${escape(item.author.username)}</strong> <small>${new Date(item.createdAt).toLocaleString()}</small><p>${escape(item.text)}</p><button data-reply="${item.id}">Reply</button>${draw(item.id, true)}</article>`).join(''); comments.innerHTML = draw(null, false) || '<p>No comments yet.</p>'; }
+    async function load() { const response = await fetch('/api/comments'); state.comments = (await response.json()).comments || []; render(); }
+    document.querySelector('#auth').addEventListener('click', async (event) => { if (!event.target.dataset.action) return; event.preventDefault(); const form = new FormData(event.currentTarget); const response = await fetch('/api/' + event.target.dataset.action, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.fromEntries(form)) }); const result = await response.json(); if (!response.ok) return status.textContent = result.error; state.token = result.token; localStorage.setItem('token', state.token); status.textContent = `Logged in as ${result.user.username}.`; });
+    document.querySelector('#comment-form').addEventListener('submit', async (event) => { event.preventDefault(); const form = new FormData(event.currentTarget); const response = await fetch('/api/comments', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${state.token || ''}` }, body: JSON.stringify(Object.fromEntries(form)) }); const result = await response.json(); if (!response.ok) return status.textContent = result.error; event.currentTarget.reset(); });
+    comments.addEventListener('click', (event) => { const button = event.target.closest('[data-reply]'); if (button) document.querySelector('[name="parentId"]').value = button.dataset.reply; });
+    new EventSource('/api/comments/stream').addEventListener('comment', (event) => { state.comments.push(JSON.parse(event.data)); render(); }); load(); render();
+  </script>
+</body>
+</html>

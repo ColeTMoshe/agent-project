@@ -24,6 +24,9 @@ jobs:
       - name: Check JavaScript syntax
         run: node --check server.js
 
+      - name: Check application module syntax
+        run: node --check src/app.js
+
       - name: Smoke-test server response
         shell: bash
         run: |
@@ -40,5 +43,22 @@ jobs:
             sleep 1
           done
 
+          cat server.log
+           exit 1
+
+      - name: Smoke-test health endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          node server.js >server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in {1..20}; do
+            if response=$(curl --silent --show-error --fail http://127.0.0.1:8787/healthz); then
+              echo "$response" | grep -q '"status":"ok"'
+              exit 0
+            fi
+            sleep 1
+          done
           cat server.log
           exit 1
