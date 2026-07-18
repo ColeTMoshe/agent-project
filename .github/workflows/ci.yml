@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check JavaScript syntax
+        run: node --check server.js
+
+      - name: Smoke-test server response
+        shell: bash
+        run: |
+          set -euo pipefail
+          node server.js >server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+
+          for attempt in {1..20}; do
+            if response=$(curl --silent --show-error --fail http://127.0.0.1:8787); then
+              test "$response" = 'agent.e1x8.xyz is online'
+              exit 0
+            fi
+            sleep 1
+          done
+
+          cat server.log
+          exit 1
