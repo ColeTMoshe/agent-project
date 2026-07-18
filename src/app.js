@@ -8,7 +8,10 @@ const dataFile = path.join(dataDirectory, 'app.json');
 const publicDirectory = path.join(__dirname, '..', 'public');
 const sessions = new Map();
 const streams = new Set();
+const rateLimits = new Map();
 const startedAt = Date.now();
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 120;
 
 function loadData() {
   try {
@@ -36,6 +39,21 @@ function sendJson(response, status, value) {
     'cache-control': 'no-store',
   });
   response.end(body);
+}
+
+function rateLimit(request, response) {
+  const key = request.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const current = rateLimits.get(key);
+  if (!current || current.resetAt <= now) {
+    rateLimits.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  current.count += 1;
+  if (current.count <= RATE_LIMIT_MAX) return true;
+  response.setHeader('retry-after', Math.ceil((current.resetAt - now) / 1000));
+  sendJson(response, 429, { error: 'Too many requests. Try again later.' });
+  return false;
 }
 
 function publicUser(user) {
@@ -115,8 +133,9 @@ function serveStatic(request, response) {
 
 function createApp() {
   const server = http.createServer(async (request, response) => {
-    const url = new URL(request.url, 'http://127.0.0.1');
+      const url = new URL(request.url, 'http://127.0.0.1');
     try {
+      if (!rateLimit(request, response)) return;
       if (url.pathname === '/healthz' && request.method === 'GET') {
         return sendJson(response, 200, { status: 'ok', uptime: process.uptime() });
       }
@@ -153,7 +172,8 @@ function createApp() {
       }
 
       if (url.pathname === '/api/comments' && request.method === 'GET') {
-        return sendJson(response, 200, { comments: data.comments.map(publicComment) });
+        const comments = [...data.comments].sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+        return sendJson(response, 200, { comments: comments.map(publicComment) });
       }
 
       if (url.pathname === '/api/comments' && request.method === 'POST') {

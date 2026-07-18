@@ -30,7 +30,7 @@
     document.querySelector('#auth').addEventListener('click', async (event) => { if (!event.target.dataset.action) return; event.preventDefault(); const form = new FormData(event.currentTarget); const response = await fetch('/api/' + event.target.dataset.action, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.fromEntries(form)) }); const result = await response.json(); if (!response.ok) return status.textContent = result.error; state.token = result.token; localStorage.setItem('token', state.token); status.textContent = `Logged in as ${result.user.username}.`; });
     document.querySelector('#comment-form').addEventListener('submit', async (event) => { event.preventDefault(); const form = new FormData(event.currentTarget); const response = await fetch('/api/comments', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${state.token || ''}` }, body: JSON.stringify(Object.fromEntries(form)) }); const result = await response.json(); if (!response.ok) return status.textContent = result.error; event.currentTarget.reset(); });
     comments.addEventListener('click', (event) => { const button = event.target.closest('[data-reply]'); if (button) document.querySelector('[name="parentId"]').value = button.dataset.reply; });
-    new EventSource('/api/comments/stream').addEventListener('comment', (event) => { state.comments.push(JSON.parse(event.data)); render(); }); load(); render();
+    new EventSource('/api/comments/stream').addEventListener('comment', (event) => { state.comments.unshift(JSON.parse(event.data)); render(); }); load(); render();
   </script>
 </body>
 </html>

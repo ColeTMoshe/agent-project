@@ -4,3 +4,4 @@
 - [x] Review issue #2; no implementation requirements were provided, and the request to expose passwords was rejected.
 - [x] Add a machine-readable `/healthz` endpoint with service status and uptime for monitoring.
 - [x] Add safe accounts and a live comment section with replies and emoji-safe rendering; never expose passwords.
+- [x] Sort comments newest-first and add per-IP API rate limiting.
