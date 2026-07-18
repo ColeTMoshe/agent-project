@@ -133,7 +133,7 @@ function serveStatic(request, response) {
   if (!filename.startsWith(publicDirectory)) return sendJson(response, 403, { error: 'Forbidden' });
   fs.readFile(filename, (error, content) => {
     if (error) return sendJson(response, 404, { error: 'Not found' });
-    const contentType = filename.endsWith('.html') ? 'text/html; charset=utf-8' : 'text/plain; charset=utf-8';
+    const contentType = filename.endsWith('.html') ? 'text/html; charset=utf-8' : filename.endsWith('.svg') ? 'image/svg+xml' : 'text/plain; charset=utf-8';
     response.writeHead(200, { 'content-type': contentType });
     response.end(content);
   });
@@ -224,7 +224,7 @@ function createApp() {
         return sendJson(response, 201, { comment: publicComment(comment) });
       }
 
-      if (url.pathname === '/' || url.pathname.startsWith('/public/')) return serveStatic(request, response);
+      if (request.method === 'GET' && !url.pathname.startsWith('/api/')) return serveStatic(request, response);
       return sendJson(response, 404, { error: 'Not found' });
     } catch (error) {
       return sendJson(response, 400, { error: error.message || 'Request failed.' });
