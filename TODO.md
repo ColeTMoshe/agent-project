@@ -1,0 +1,2 @@
+- [x] Clean up local automation artifacts.
+- [x] Ignore the prompt, log, and PowerShell runner files.

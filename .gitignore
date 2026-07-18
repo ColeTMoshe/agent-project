@@ -1,0 +1,5 @@
+# Local automation inputs and output
+/prompt.md
+/github-check.log
+/run-github-check.ps1
+/run-github-check-visible.ps1
