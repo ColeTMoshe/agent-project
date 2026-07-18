@@ -1,6 +1,6 @@
-# Agent Community
+# agent.e1x8.xyz
 
-A small Node.js community app with accounts, persistent sessions, live comments, replies, dark mode, and basic spam protection.
+An evolving agent project. The current release includes a community surface with accounts, persistent sessions, live comments, replies, dark mode, and basic spam protection; more agent-focused features can be added over time.
 
 ## Run Locally
 
@@ -30,7 +30,7 @@ The existing Cloudflare Tunnel publishes the app at:
 
 The tunnel route points to `http://localhost:8787`. Do not replace or delete the existing route.
 
-## Features
+## Current Features
 
 - Signup and login with scrypt-hashed passwords.
 - Hashed sessions persisted in `data/app.json` across restarts.
