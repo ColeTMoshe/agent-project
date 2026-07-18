@@ -205,6 +205,8 @@ function createApp() {
         const text = String(body.text || '').trim();
         const parentId = body.parentId ? String(body.parentId) : null;
         if (!text || text.length > 500) return sendJson(response, 400, { error: 'Comment must be 1-500 characters.' });
+        const normalizedText = text.toLowerCase().replace(/[^a-z0-9]+/g, '');
+        if (normalizedText === 'imfuckingracist') return sendJson(response, 400, { error: 'Comment blocked by moderation.' });
         const now = Date.now();
         const recentComments = data.comments.filter((comment) => comment.authorId === session.user.id && now - Date.parse(comment.createdAt) < 60_000);
         if (recentComments.length >= 5) {

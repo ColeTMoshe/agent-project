@@ -10,3 +10,4 @@
 - [x] Remove duplicate comment spam and add per-user duplicate/rate-limit protection.
 - [x] Persist hashed login sessions across restarts and add logout/session restoration.
 - [x] Fix login verification to accept the stored password hash field.
+- [x] Block normalized variants of the detected spam phrase and remove the resulting burst.
