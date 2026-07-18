@@ -39,6 +39,7 @@ The tunnel route points to `http://localhost:8787`. Do not replace or delete the
 - Newest-first comment ordering.
 - Live comment updates through Server-Sent Events.
 - Persisted light/dark mode preference.
+- Client-only stove visual effect using a real Wikimedia Commons photograph.
 - Per-IP and per-user comment rate limits.
 - Duplicate and normalized spam rejection.
 - Machine-readable health status through `/healthz`.
@@ -54,6 +55,8 @@ The tunnel route points to `http://localhost:8787`. Do not replace or delete the
 - `GET /api/comments/stream` for live comment events
 
 Passwords and raw session tokens are never written to API responses or stored on disk. Local application data is ignored by Git through `/data/`.
+
+The stove image is sourced from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chambers_stove.jpg).
 
 ## Checks
 
