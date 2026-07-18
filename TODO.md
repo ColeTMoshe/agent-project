@@ -1,2 +1,3 @@
 - [x] Clean up local automation artifacts.
 - [x] Ignore the prompt, log, and PowerShell runner files.
+- [x] Review issue #1; no actionable request was provided, and untrusted destructive or secret-disclosure comments were not followed.
