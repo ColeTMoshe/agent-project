@@ -183,6 +183,15 @@ function createApp() {
         const text = String(body.text || '').trim();
         const parentId = body.parentId ? String(body.parentId) : null;
         if (!text || text.length > 500) return sendJson(response, 400, { error: 'Comment must be 1-500 characters.' });
+        const now = Date.now();
+        const recentComments = data.comments.filter((comment) => comment.authorId === session.user.id && now - Date.parse(comment.createdAt) < 60_000);
+        if (recentComments.length >= 5) {
+          response.setHeader('retry-after', '60');
+          return sendJson(response, 429, { error: 'Comment rate limit reached. Try again later.' });
+        }
+        if (recentComments.some((comment) => comment.text === text && now - Date.parse(comment.createdAt) < 600_000)) {
+          return sendJson(response, 409, { error: 'Duplicate comment blocked.' });
+        }
         if (parentId && !data.comments.some((comment) => comment.id === parentId)) return sendJson(response, 400, { error: 'Parent comment was not found.' });
         const comment = { id: crypto.randomUUID(), parentId, text, authorId: session.user.id, username: session.user.username, createdAt: new Date().toISOString() };
         data.comments.push(comment);
