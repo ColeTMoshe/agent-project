@@ -25,25 +25,35 @@
     .reply { margin-left: 28px; }
     small { color: var(--muted); } #status { min-height: 1.5em; color: var(--muted); }
     @media (max-width: 560px) { header { padding-top: 22px; } .reply { margin-left: 12px; } }
+    #stove-button { margin: 18px 16px; }
+    #stove-overlay { align-items: center; background: radial-gradient(circle, #ffe66d 0 8%, #ff7b22 28%, #9d1515 58%, #120b12 100%); color: #fff; display: none; inset: 0; justify-content: center; position: fixed; text-align: center; z-index: 10; }
+    #stove-overlay.active { animation: blast 900ms ease-out both; display: flex; }
+    #stove-overlay h2 { font-size: clamp(4rem, 20vw, 12rem); margin: 0; text-shadow: 0 6px 0 #7c1111; transform: rotate(-8deg); }
+    @keyframes blast { 0% { opacity: 0; transform: scale(.2); } 35% { opacity: 1; transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
   </style>
 </head>
 <body>
   <header><h1>agent.e1x8.xyz</h1><button id="theme-toggle" class="secondary" type="button">Dark mode</button></header>
   <p class="intro"><a href="https://github.com/ColeTMoshe/agent-project" target="_blank" rel="noreferrer">View this project on GitHub</a><br>An evolving agent project. Explore the current community features and follow along as it grows.</p>
+  <button id="stove-button" class="secondary" type="button">Light the 1985 gas stove</button>
   <section>
     <form id="auth"><input name="username" placeholder="Username" required><input name="password" type="password" minlength="8" placeholder="Password" required><span><button data-action="signup">Sign up</button> <button data-action="login">Log in</button> <button id="logout" class="secondary" type="button" hidden>Log out</button></span></form>
     <p id="status"></p>
   </section>
   <form id="comment-form"><textarea name="text" maxlength="500" placeholder="Write a comment... 😀" required></textarea><input name="parentId" type="hidden"><button>Post comment</button></form>
   <main id="comments"></main>
+  <div id="stove-overlay" role="status" aria-live="assertive"><h2>BOOM!</h2></div>
   <script>
     const state = { token: localStorage.getItem('token'), comments: [] };
     const root = document.documentElement;
     const themeToggle = document.querySelector('#theme-toggle');
+    const stoveButton = document.querySelector('#stove-button');
+    const stoveOverlay = document.querySelector('#stove-overlay');
     const savedTheme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     function setTheme(theme) { root.dataset.theme = theme; themeToggle.textContent = theme === 'dark' ? 'Light mode' : 'Dark mode'; localStorage.setItem('theme', theme); }
     setTheme(savedTheme);
     themeToggle.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+    stoveButton.addEventListener('click', () => { stoveOverlay.classList.add('active'); });
     const status = document.querySelector('#status');
     const comments = document.querySelector('#comments');
     const logout = document.querySelector('#logout');
