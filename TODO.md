@@ -8,3 +8,4 @@
 - [x] Add a link to the project repository from the community page.
 - [x] Add persisted dark mode and improve responsive community page styling.
 - [x] Remove duplicate comment spam and add per-user duplicate/rate-limit protection.
+- [x] Persist hashed login sessions across restarts and add logout/session restoration.

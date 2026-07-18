@@ -6,7 +6,6 @@ const path = require('node:path');
 const dataDirectory = path.join(__dirname, '..', 'data');
 const dataFile = path.join(dataDirectory, 'app.json');
 const publicDirectory = path.join(__dirname, '..', 'public');
-const sessions = new Map();
 const streams = new Set();
 const rateLimits = new Map();
 const startedAt = Date.now();
@@ -24,6 +23,7 @@ function loadData() {
 const data = loadData();
 data.users ||= [];
 data.comments ||= [];
+data.sessions ||= [];
 
 function saveData() {
   fs.mkdirSync(dataDirectory, { recursive: true });
@@ -83,17 +83,25 @@ function passwordsMatch(password, user) {
 
 function tokenFor(user) {
   const token = crypto.randomBytes(32).toString('hex');
-  sessions.set(token, { userId: user.id, expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 });
+  const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+  data.sessions = data.sessions.filter((session) => session.expiresAt > Date.now());
+  data.sessions.push({ tokenHash: hashToken(token), userId: user.id, expiresAt });
+  saveData();
   return token;
+}
+
+function hashToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
 }
 
 function authenticatedUser(request) {
   const authorization = request.headers.authorization || '';
   const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
-  const session = sessions.get(token);
+  const tokenHash = hashToken(token);
+  const session = data.sessions.find((candidate) => candidate.tokenHash === tokenHash);
   if (!session || session.expiresAt < Date.now()) return null;
   const user = data.users.find((candidate) => candidate.id === session.userId);
-  return user ? { user, token } : null;
+  return user ? { user, token, tokenHash } : null;
 }
 
 function readBody(request) {
@@ -161,6 +169,20 @@ function createApp() {
         const user = data.users.find((candidate) => candidate.username.toLowerCase() === String(body.username || '').trim().toLowerCase());
         if (!user || !passwordsMatch(String(body.password || ''), user)) return sendJson(response, 401, { error: 'Invalid username or password.' });
         return sendJson(response, 200, { user: publicUser(user), token: tokenFor(user) });
+      }
+
+      if (url.pathname === '/api/me' && request.method === 'GET') {
+        const session = authenticatedUser(request);
+        return session ? sendJson(response, 200, { user: publicUser(session.user) }) : sendJson(response, 401, { error: 'Not logged in.' });
+      }
+
+      if (url.pathname === '/api/logout' && request.method === 'POST') {
+        const session = authenticatedUser(request);
+        if (session) {
+          data.sessions = data.sessions.filter((candidate) => candidate.tokenHash !== session.tokenHash);
+          saveData();
+        }
+        return sendJson(response, 200, { ok: true });
       }
 
       if (url.pathname === '/api/comments/stream' && request.method === 'GET') {
