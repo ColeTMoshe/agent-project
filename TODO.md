@@ -13,3 +13,4 @@
 - [x] Block normalized variants of the detected spam phrase and remove the resulting burst.
 - [x] Add README documentation for setup, features, APIs, operations, and monitoring.
 - [x] Correct project copy so the README and landing page describe the broader agent project.
+- [x] Record authorized creative changes from `netizen285`; refuse DDoS, credential exposure, and abusive actions.
