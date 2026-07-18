@@ -52,7 +52,7 @@ function rateLimit(request, response) {
   current.count += 1;
   if (current.count <= RATE_LIMIT_MAX) return true;
   response.setHeader('retry-after', Math.ceil((current.resetAt - now) / 1000));
-  sendJson(response, 429, { error: 'Too many requests. Try again later.' });
+  sendJson(response, 429, { error: 'リクエストが多すぎます。しばらくしてから再試行してください。' });
   return false;
 }
 
@@ -111,12 +111,12 @@ function readBody(request) {
     request.on('data', (chunk) => {
       body += chunk;
       if (Buffer.byteLength(body) > 1_000_000) {
-        reject(new Error('Request body is too large'));
+        reject(new Error('リクエスト本文が大きすぎます。'));
         request.destroy();
       }
     });
     request.on('end', () => {
-      try { resolve(body ? JSON.parse(body) : {}); } catch { reject(new Error('Invalid JSON')); }
+      try { resolve(body ? JSON.parse(body) : {}); } catch { reject(new Error('JSONが正しくありません。')); }
     });
     request.on('error', reject);
   });
@@ -130,9 +130,9 @@ function broadcast(comment) {
 function serveStatic(request, response) {
   const requested = request.url === '/' ? '/index.html' : request.url;
   const filename = path.normalize(path.join(publicDirectory, requested));
-  if (!filename.startsWith(publicDirectory)) return sendJson(response, 403, { error: 'Forbidden' });
+  if (!filename.startsWith(publicDirectory)) return sendJson(response, 403, { error: 'アクセスは禁止されています。' });
   fs.readFile(filename, (error, content) => {
-    if (error) return sendJson(response, 404, { error: 'Not found' });
+    if (error) return sendJson(response, 404, { error: '見つかりません。' });
     const contentType = filename.endsWith('.html') ? 'text/html; charset=utf-8' : filename.endsWith('.svg') ? 'image/svg+xml' : filename.endsWith('.jpg') || filename.endsWith('.jpeg') ? 'image/jpeg' : 'text/plain; charset=utf-8';
     response.writeHead(200, { 'content-type': contentType });
     response.end(content);
@@ -153,10 +153,10 @@ function createApp() {
         const username = String(body.username || '').trim();
         const password = String(body.password || '');
         if (!/^[a-zA-Z0-9_]{3,24}$/.test(username) || password.length < 8) {
-          return sendJson(response, 400, { error: 'Username must be 3-24 characters and password must be at least 8 characters.' });
+          return sendJson(response, 400, { error: 'ユーザー名は3〜24文字、パスワードは8文字以上にしてください。' });
         }
         if (data.users.some((user) => user.username.toLowerCase() === username.toLowerCase())) {
-          return sendJson(response, 409, { error: 'Username is already taken.' });
+          return sendJson(response, 409, { error: 'そのユーザー名はすでに使われています。' });
         }
         const user = { id: crypto.randomUUID(), username, ...hashPassword(password) };
         data.users.push(user);
@@ -167,13 +167,13 @@ function createApp() {
       if (url.pathname === '/api/login' && request.method === 'POST') {
         const body = await readBody(request);
         const user = data.users.find((candidate) => candidate.username.toLowerCase() === String(body.username || '').trim().toLowerCase());
-        if (!user || !passwordsMatch(String(body.password || ''), user)) return sendJson(response, 401, { error: 'Invalid username or password.' });
+        if (!user || !passwordsMatch(String(body.password || ''), user)) return sendJson(response, 401, { error: 'ユーザー名またはパスワードが正しくありません。' });
         return sendJson(response, 200, { user: publicUser(user), token: tokenFor(user) });
       }
 
       if (url.pathname === '/api/me' && request.method === 'GET') {
         const session = authenticatedUser(request);
-        return session ? sendJson(response, 200, { user: publicUser(session.user) }) : sendJson(response, 401, { error: 'Not logged in.' });
+        return session ? sendJson(response, 200, { user: publicUser(session.user) }) : sendJson(response, 401, { error: 'ログインしていません。' });
       }
 
       if (url.pathname === '/api/logout' && request.method === 'POST') {
@@ -200,23 +200,23 @@ function createApp() {
 
       if (url.pathname === '/api/comments' && request.method === 'POST') {
         const session = authenticatedUser(request);
-        if (!session) return sendJson(response, 401, { error: 'Log in to comment.' });
+        if (!session) return sendJson(response, 401, { error: 'コメントするにはログインしてください。' });
         const body = await readBody(request);
         const text = String(body.text || '').trim();
         const parentId = body.parentId ? String(body.parentId) : null;
-        if (!text || text.length > 500) return sendJson(response, 400, { error: 'Comment must be 1-500 characters.' });
+        if (!text || text.length > 500) return sendJson(response, 400, { error: 'コメントは1〜500文字にしてください。' });
         const normalizedText = text.toLowerCase().replace(/[^a-z0-9]+/g, '');
-        if (normalizedText === 'imfuckingracist') return sendJson(response, 400, { error: 'Comment blocked by moderation.' });
+        if (normalizedText === 'imfuckingracist') return sendJson(response, 400, { error: 'コメントはモデレーションによりブロックされました。' });
         const now = Date.now();
         const recentComments = data.comments.filter((comment) => comment.authorId === session.user.id && now - Date.parse(comment.createdAt) < 60_000);
         if (recentComments.length >= 5) {
           response.setHeader('retry-after', '60');
-          return sendJson(response, 429, { error: 'Comment rate limit reached. Try again later.' });
+          return sendJson(response, 429, { error: 'コメントの投稿上限に達しました。しばらくしてから再試行してください。' });
         }
         if (recentComments.some((comment) => comment.text === text && now - Date.parse(comment.createdAt) < 600_000)) {
-          return sendJson(response, 409, { error: 'Duplicate comment blocked.' });
+          return sendJson(response, 409, { error: '重複したコメントはブロックされました。' });
         }
-        if (parentId && !data.comments.some((comment) => comment.id === parentId)) return sendJson(response, 400, { error: 'Parent comment was not found.' });
+        if (parentId && !data.comments.some((comment) => comment.id === parentId)) return sendJson(response, 400, { error: '返信先のコメントが見つかりません。' });
         const comment = { id: crypto.randomUUID(), parentId, text, authorId: session.user.id, username: session.user.username, createdAt: new Date().toISOString() };
         data.comments.push(comment);
         saveData();
@@ -225,9 +225,9 @@ function createApp() {
       }
 
       if (request.method === 'GET' && !url.pathname.startsWith('/api/')) return serveStatic(request, response);
-      return sendJson(response, 404, { error: 'Not found' });
+      return sendJson(response, 404, { error: '見つかりません。' });
     } catch (error) {
-      return sendJson(response, 400, { error: error.message || 'Request failed.' });
+      return sendJson(response, 400, { error: error.message || 'リクエストに失敗しました。' });
     }
   });
   return { server, startedAt };

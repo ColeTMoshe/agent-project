@@ -16,3 +16,4 @@
 - [x] Record authorized creative changes from `netizen285`; refuse DDoS, credential exposure, and abusive actions.
 - [x] Add a client-only 1985 gas-stove visual effect that resets on refresh.
 - [x] Revise the stove effect to use a real image and removable falling pieces.
+- [x] Translate the public interface and API messages to Japanese without a language selector.
