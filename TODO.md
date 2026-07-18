@@ -6,3 +6,4 @@
 - [x] Add safe accounts and a live comment section with replies and emoji-safe rendering; never expose passwords.
 - [x] Sort comments newest-first and add per-IP API rate limiting.
 - [x] Add a link to the project repository from the community page.
+- [x] Add persisted dark mode and improve responsive community page styling.
