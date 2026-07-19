@@ -54,6 +54,10 @@ Click requests are rate-limited per visitor IP. A `429` response includes an Eng
 
 The click total is persisted in local application data, ignored by Git through `/data/`.
 
+## Add Something
+
+Want a feature or a ridiculous change? Open an [issue](https://github.com/ColeTMoshe/agent-project/issues/new) or [pull request](https://github.com/ColeTMoshe/agent-project/pulls). Actionable requests are automatically acknowledged and worked on.
+
 ## Checks
 
 ```powershell

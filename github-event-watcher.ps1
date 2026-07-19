@@ -76,9 +76,6 @@ function Get-ChangedItems($Current, $Previous) {
   foreach ($property in $Current.GetEnumerator()) {
     if ($previousHashes[$property.Key] -ne [string]$property.Value) { $changes += [ordered]@{ ref = $property.Key; hash = $property.Value } }
   }
-  foreach ($key in $previousHashes.Keys) {
-    if (-not $Current.Contains($key)) { $changes += [ordered]@{ ref = $key; hash = $previousHashes[$key]; removed = $true } }
-  }
   return @($changes)
 }
 
