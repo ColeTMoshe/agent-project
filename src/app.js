@@ -60,8 +60,9 @@ function rateLimit(request, response) {
   }
   current.count += 1;
   if (current.count <= RATE_LIMIT_MAX) return true;
-  response.setHeader('retry-after', Math.ceil((current.resetAt - now) / 1000));
-  sendJson(response, 429, { error: 'リクエストが多すぎます。しばらくしてから再試行してください。' });
+  const retryAfter = Math.ceil((current.resetAt - now) / 1000);
+  response.setHeader('retry-after', retryAfter);
+  sendJson(response, 429, { error: `Too many requests. Try again in ${retryAfter} seconds.`, retryAfter });
   return false;
 }
 
@@ -319,6 +320,15 @@ function createApp() {
       return sendJson(response, 400, { error: error.message || 'リクエストに失敗しました。' });
     }
   });
+  const autoClickTimer = setInterval(() => {
+    if (!data.upgrades.auto) return;
+    data.clicks += data.upgrades.auto;
+    startNextBoss();
+    saveData();
+    broadcastClicks();
+  }, 1_000);
+  autoClickTimer.unref();
+  server.once('close', () => clearInterval(autoClickTimer));
   server.on('upgrade', (request, socket) => {
     if (request.url !== '/ws') return socket.destroy();
     const key = request.headers['sec-websocket-key'];

@@ -35,6 +35,7 @@ The tunnel route points to `http://localhost:8787`. Do not replace or delete the
 ## Current Features
 
 - Shared persisted click counter.
+- Shared auto-click upgrades run once per second on the server, including while browsers are closed.
 - Live click updates through WebSockets at `/ws`.
 - Green Clicker interface and milestone rewards at 10, 50, and 100 clicks.
 - G. SPAMTON'S GREEN SHOP panel and Birdvirus seagull unlock.
@@ -48,6 +49,8 @@ The tunnel route points to `http://localhost:8787`. Do not replace or delete the
 - `POST /api/clicker` to add one shared click.
 - `POST /api/clicker/upgrade` to purchase shared clicker upgrades.
 - `/ws` for live shared-click updates.
+
+Click requests are rate-limited per visitor IP. A `429` response includes an English error and `retryAfter` countdown.
 
 The click total is persisted in local application data, ignored by Git through `/data/`.
 
