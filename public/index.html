@@ -16,6 +16,12 @@
     #clicker:active { box-shadow: 0 4px 0 #075020, 0 8px 20px #0009; transform: translateY(12px) rotate(4deg) scale(.96); }
     #clicker:focus-visible { outline: 5px solid #fff; outline-offset: 7px; }
     #feed { color: #baff70; min-height: 1.5em; }
+    #rewards { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 18px 0; }
+    .reward { background: #0c3e1c; border: 2px solid #287b42; border-radius: 999px; color: #7cae81; padding: 7px 11px; }
+    .reward.unlocked { border-color: #baff70; color: #e8ffe9; }
+    #shop { background: #07150b; border: 3px dashed #baff70; border-radius: 14px; color: #e8ffe9; margin: 22px auto 0; max-width: 390px; padding: 14px; }
+    #shop h2 { color: #baff70; font-size: 1.2rem; margin: 0 0 8px; }
+    #bird { font-size: 2rem; margin: 0; }
     .pop { animation: pop 700ms ease-out forwards; color: #fff; font-size: 2rem; font-weight: 900; pointer-events: none; position: fixed; text-shadow: 2px 2px #148c3c; }
     @keyframes pop { to { opacity: 0; transform: translateY(-110px) rotate(30deg) scale(1.8); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
@@ -28,13 +34,17 @@
     <strong id="total" aria-live="polite">0</strong>
     <button id="clicker" type="button">CLICK IT!!!</button>
     <p id="feed" aria-live="polite">Waiting for clicks from everywhere.</p>
+    <section id="rewards" aria-label="Milestone rewards"><span class="reward" data-milestone="10">10: Greenhorn</span><span class="reward" data-milestone="50">50: Birdvirus</span><span class="reward" data-milestone="100">100: Big Shot</span></section>
+    <section id="shop"><h2>G. SPAMTON'S GREEN SHOP</h2><p>Milestones unlock nonsense.</p><p id="bird" hidden>🕊️ BIRDVIRUS UNLOCKED</p></section>
   </main>
   <script>
     const total = document.querySelector('#total');
     const clicker = document.querySelector('#clicker');
     const feed = document.querySelector('#feed');
+    const rewards = [...document.querySelectorAll('.reward')];
+    const bird = document.querySelector('#bird');
     let clicks = 0;
-    function draw() { total.textContent = clicks.toLocaleString('en-US'); }
+    function draw() { total.textContent = clicks.toLocaleString('en-US'); rewards.forEach((reward) => reward.classList.toggle('unlocked', clicks >= Number(reward.dataset.milestone))); bird.hidden = clicks < 50; }
     function pop() { const item = document.createElement('span'); item.className = 'pop'; item.textContent = ['+1', 'GREEN!', 'GO!', '⚡'][Math.floor(Math.random() * 4)]; item.style.left = `${20 + Math.random() * 60}%`; item.style.top = `${35 + Math.random() * 35}%`; item.addEventListener('animationend', () => item.remove()); document.body.append(item); }
     clicker.addEventListener('click', async () => { const response = await fetch('/api/clicker', { method: 'POST' }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; clicks = result.clicks; draw(); pop(); });
     fetch('/api/clicker').then((response) => response.json()).then((result) => { clicks = result.clicks || 0; draw(); });
