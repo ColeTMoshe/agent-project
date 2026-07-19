@@ -6,6 +6,7 @@
 - Handle edge cases as part of the feature: cover threshold crossings, reconnects, refreshes, repeated interactions, and mobile behavior when they apply.
 - Read the complete issue or pull request, including all comments and the full change set, before responding or changing code.
 - Acknowledge a new actionable GitHub issue or pull request with a brief comment as soon as it is understood, then carry out the requested work.
+- Reply to every new GitHub issue or pull request, including image-only posts or messages without an explicit request.
 - When the watcher reports a GitHub change, inspect every object in its compact `changed` manifest and read each listed issue or pull request directly before saying there is no new request.
 - On GitHub, reply like a person running a chaotic clicker: use short, natural language such as "sure" or "nah". Keep the main reply brief; when an explanation helps, put it in a `<details><summary>why</summary>...</details>` spoiler instead of reciting a policy wall.
 - When reviewing pull requests, identify concrete breakage and request the necessary fixes before merge. Do not merge changes that break the public route or service.
