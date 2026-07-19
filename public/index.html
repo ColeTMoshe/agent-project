@@ -23,7 +23,7 @@
     #shop h2 { color: #baff70; font-size: 1.2rem; margin: 0 0 8px; }
     #bird { font-size: 2rem; margin: 0; }
     .pop { animation: pop 700ms ease-out forwards; color: #fff; font-size: 2rem; font-weight: 900; pointer-events: none; position: fixed; text-shadow: 2px 2px #148c3c; }
-    #gnome { bottom: 12px; cursor: pointer; font-size: 3rem; position: fixed; right: 16px; }
+    #gnome { bottom: 12px; cursor: pointer; position: fixed; right: 16px; width: 58px; }
     @keyframes pop { to { opacity: 0; transform: translateY(-110px) rotate(30deg) scale(1.8); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
   </style>
@@ -40,7 +40,7 @@
     <section id="shop"><h2>G. SPAMTON'S GREEN SHOP</h2><p>Milestones unlock nonsense.</p><p id="bird" hidden>🕊️ BIRDVIRUS UNLOCKED</p></section>
     <section id="upgrades"><button data-upgrade="double">Double +1 (15)</button><button data-upgrade="auto">Auto click (50)</button><button data-upgrade="boost">Boost (600)</button></section>
   </main>
-  <button id="gnome" type="button" aria-label="Angry gnome">🧙</button>
+  <button id="gnome" type="button" aria-label="Angry gnome"><img src="/wizard.svg" alt=""></button>
   <script>
     const total = document.querySelector('#total');
     const clicker = document.querySelector('#clicker');
@@ -52,8 +52,8 @@
     let lastClicks = 0;
     function draw() { total.textContent = clicks.toLocaleString('en-US'); document.title = `${clicks.toLocaleString('en-US')} - Green Clicker`; rewards.forEach((reward) => reward.classList.toggle('unlocked', clicks >= Number(reward.dataset.milestone))); bird.hidden = clicks < 50; }
     function pop() { const item = document.createElement('span'); item.className = 'pop'; item.textContent = ['+1', 'GREEN!', 'GO!', '⚡'][Math.floor(Math.random() * 4)]; item.style.left = `${20 + Math.random() * 60}%`; item.style.top = `${35 + Math.random() * 35}%`; item.addEventListener('animationend', () => item.remove()); document.body.append(item); }
-    gnome.addEventListener('click', () => { const tomato = document.createElement('span'); tomato.className = 'pop'; tomato.textContent = '🍅'; tomato.style.left = '82%'; tomato.style.top = '78%'; tomato.addEventListener('animationend', () => tomato.remove()); document.body.append(tomato); });
-    clicker.addEventListener('click', async () => { const response = await fetch('/api/clicker', { method: 'POST' }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; clicks = result.clicks; draw(); pop(); gnome.textContent = ['🧙', '🧙🍅', '🧙⚡'][clicks % 3]; });
+    gnome.addEventListener('click', () => { const tomato = document.createElement('img'); tomato.className = 'pop'; tomato.src = '/tomato.svg'; tomato.alt = ''; tomato.style.left = '82%'; tomato.style.top = '78%'; tomato.addEventListener('animationend', () => tomato.remove()); document.body.append(tomato); });
+    clicker.addEventListener('click', async () => { const response = await fetch('/api/clicker', { method: 'POST' }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; clicks = result.clicks; draw(); pop(); });
     document.querySelector('#upgrades').addEventListener('click', async (event) => { const type = event.target.dataset.upgrade; if (!type) return; const response = await fetch('/api/clicker/upgrade', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ type }) }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; clicks = result.clicks; draw(); });
     fetch('/api/clicker').then((response) => response.json()).then((result) => { clicks = result.clicks || 0; draw(); });
     const socket = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`); socket.addEventListener('message', (event) => { const update = JSON.parse(event.data); if (update.type === 'clicks') { clicks = update.clicks; draw(); feed.textContent = 'Someone clicked the world.'; } });
