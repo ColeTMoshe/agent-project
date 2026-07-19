@@ -34,6 +34,7 @@
     <strong id="total" aria-live="polite">0</strong>
     <button id="clicker" type="button">CLICK IT!!!</button>
     <p id="feed" aria-live="polite">Waiting for clicks from everywhere.</p>
+    <p id="cps">0 clicks/sec</p>
     <section id="rewards" aria-label="Milestone rewards"><span class="reward" data-milestone="10">10: Greenhorn</span><span class="reward" data-milestone="50">50: Birdvirus</span><span class="reward" data-milestone="100">100: Big Shot</span></section>
     <section id="shop"><h2>G. SPAMTON'S GREEN SHOP</h2><p>Milestones unlock nonsense.</p><p id="bird" hidden>🕊️ BIRDVIRUS UNLOCKED</p></section>
     <section id="upgrades"><button data-upgrade="double">Double +1 (15)</button><button data-upgrade="auto">Auto click (50)</button><button data-upgrade="boost">Boost (600)</button></section>
@@ -45,12 +46,15 @@
     const rewards = [...document.querySelectorAll('.reward')];
     const bird = document.querySelector('#bird');
     let clicks = 0;
-    function draw() { total.textContent = clicks.toLocaleString('en-US'); rewards.forEach((reward) => reward.classList.toggle('unlocked', clicks >= Number(reward.dataset.milestone))); bird.hidden = clicks < 50; }
+    let lastClicks = 0;
+    function draw() { total.textContent = clicks.toLocaleString('en-US'); document.title = `${clicks.toLocaleString('en-US')} - Green Clicker`; rewards.forEach((reward) => reward.classList.toggle('unlocked', clicks >= Number(reward.dataset.milestone))); bird.hidden = clicks < 50; }
     function pop() { const item = document.createElement('span'); item.className = 'pop'; item.textContent = ['+1', 'GREEN!', 'GO!', '⚡'][Math.floor(Math.random() * 4)]; item.style.left = `${20 + Math.random() * 60}%`; item.style.top = `${35 + Math.random() * 35}%`; item.addEventListener('animationend', () => item.remove()); document.body.append(item); }
     clicker.addEventListener('click', async () => { const response = await fetch('/api/clicker', { method: 'POST' }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; clicks = result.clicks; draw(); pop(); });
     document.querySelector('#upgrades').addEventListener('click', async (event) => { const type = event.target.dataset.upgrade; if (!type) return; const response = await fetch('/api/clicker/upgrade', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ type }) }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; clicks = result.clicks; draw(); });
     fetch('/api/clicker').then((response) => response.json()).then((result) => { clicks = result.clicks || 0; draw(); });
     const socket = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`); socket.addEventListener('message', (event) => { const update = JSON.parse(event.data); if (update.type === 'clicks') { clicks = update.clicks; draw(); feed.textContent = 'Someone clicked the world.'; } });
+    setInterval(() => { document.querySelector('#cps').textContent = `${clicks - lastClicks} clicks/sec`; lastClicks = clicks; }, 1000);
+    document.addEventListener('keydown', (event) => { if (event.key.toLowerCase() === 'c' && !event.repeat && document.activeElement === document.body) clicker.click(); });
   </script>
 </body>
 </html>
