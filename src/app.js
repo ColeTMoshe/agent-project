@@ -27,6 +27,7 @@ data.comments ||= [];
 data.sessions ||= [];
 data.chaos ||= 0;
 data.clicks ||= 0;
+data.upgrades ||= { double: 0, auto: 0, boost: 0, rebirths: 0 };
 
 function saveData() {
   fs.mkdirSync(dataDirectory, { recursive: true });
@@ -228,14 +229,22 @@ function createApp() {
       }
 
       if (url.pathname === '/api/clicker' && request.method === 'GET') {
-        return sendJson(response, 200, { clicks: data.clicks });
+        return sendJson(response, 200, { clicks: data.clicks, upgrades: data.upgrades });
       }
 
       if (url.pathname === '/api/clicker' && request.method === 'POST') {
-        data.clicks += 1;
+        data.clicks += 1 + data.upgrades.boost + data.upgrades.double;
         saveData();
         broadcastClicks();
-        return sendJson(response, 200, { clicks: data.clicks });
+        return sendJson(response, 200, { clicks: data.clicks, upgrades: data.upgrades });
+      }
+
+      if (url.pathname === '/api/clicker/upgrade' && request.method === 'POST') {
+        const { type } = await readBody(request); const base = { double: 15, auto: 50, boost: 600 }[type];
+        if (!base) return sendJson(response, 400, { error: 'Invalid upgrade.' });
+        const cost = Math.ceil(base * 1.5 ** data.upgrades[type]);
+        if (data.clicks < cost) return sendJson(response, 400, { error: 'Not enough clicks.' });
+        data.clicks -= cost; data.upgrades[type] += 1; saveData(); broadcastClicks(); return sendJson(response, 200, { clicks: data.clicks, upgrades: data.upgrades });
       }
 
       if (url.pathname === '/api/comments' && request.method === 'POST') {
