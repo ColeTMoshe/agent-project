@@ -1,44 +1,44 @@
 <!doctype html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>クリック混沌</title>
+  <title>Green Clicker</title>
   <style>
-    :root { background: #130621; color: #fff5d6; font-family: system-ui, sans-serif; }
+    :root { background: #061b0d; color: #e8ffe9; font-family: system-ui, sans-serif; }
     * { box-sizing: border-box; }
-    body { align-items: center; background: radial-gradient(circle at 50% 0, #60236e, #130621 55%); display: flex; margin: 0; min-height: 100vh; overflow: hidden; text-align: center; }
+    body { align-items: center; background: radial-gradient(circle at 50% 0, #19783a, #061b0d 55%); display: flex; margin: 0; min-height: 100vh; overflow: hidden; text-align: center; }
     main { margin: auto; max-width: 680px; padding: 28px 18px; width: 100%; }
-    h1 { font-size: clamp(3rem, 12vw, 7rem); letter-spacing: -.08em; line-height: .82; margin: 0; text-shadow: 5px 5px 0 #ff387f, -4px -4px 0 #39e9e0; }
-    p { color: #d9b9e1; font-weight: 700; }
-    #total { color: #ffe26e; display: block; font-size: clamp(4rem, 18vw, 10rem); letter-spacing: -.08em; line-height: 1; text-shadow: 0 0 32px #ff7800; }
-    #clicker { aspect-ratio: 1; background: conic-gradient(#ff387f, #ffe26e, #39e9e0, #986cff, #ff387f); border: 10px solid #fff5d6; border-radius: 50%; box-shadow: 0 16px 0 #7b164f, 0 22px 45px #0009; color: #160723; cursor: pointer; font: 900 clamp(1.2rem, 5vw, 2.1rem)/1 system-ui; margin: 24px auto 34px; max-width: 300px; padding: 20px; transform: rotate(-4deg); transition: transform 80ms, box-shadow 80ms; width: 76vw; }
-    #clicker:active { box-shadow: 0 4px 0 #7b164f, 0 8px 20px #0009; transform: translateY(12px) rotate(4deg) scale(.96); }
+    h1 { font-size: clamp(3rem, 12vw, 7rem); letter-spacing: -.08em; line-height: .82; margin: 0; text-shadow: 5px 5px 0 #0c3e1c, -4px -4px 0 #8cff5d; }
+    p { color: #a9e8ae; font-weight: 700; }
+    #total { color: #baff70; display: block; font-size: clamp(4rem, 18vw, 10rem); letter-spacing: -.08em; line-height: 1; text-shadow: 0 0 32px #2fff68; }
+    #clicker { aspect-ratio: 1; background: conic-gradient(#24d65e, #baff70, #a4ffbc, #087b35, #24d65e); border: 10px solid #e8ffe9; border-radius: 50%; box-shadow: 0 16px 0 #075020, 0 22px 45px #0009; color: #031108; cursor: pointer; font: 900 clamp(1.2rem, 5vw, 2.1rem)/1 system-ui; margin: 24px auto 34px; max-width: 300px; padding: 20px; transform: rotate(-4deg); transition: transform 80ms, box-shadow 80ms; width: 76vw; }
+    #clicker:active { box-shadow: 0 4px 0 #075020, 0 8px 20px #0009; transform: translateY(12px) rotate(4deg) scale(.96); }
     #clicker:focus-visible { outline: 5px solid #fff; outline-offset: 7px; }
-    #feed { color: #ffb3d0; min-height: 1.5em; }
-    .pop { animation: pop 700ms ease-out forwards; color: #fff; font-size: 2rem; font-weight: 900; pointer-events: none; position: fixed; text-shadow: 2px 2px #ff387f; }
+    #feed { color: #baff70; min-height: 1.5em; }
+    .pop { animation: pop 700ms ease-out forwards; color: #fff; font-size: 2rem; font-weight: 900; pointer-events: none; position: fixed; text-shadow: 2px 2px #148c3c; }
     @keyframes pop { to { opacity: 0; transform: translateY(-110px) rotate(30deg) scale(1.8); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
   </style>
 </head>
 <body>
   <main>
-    <h1>クリック<br>混沌</h1>
-    <p>全員で押せ。数字を壊せ。</p>
+    <h1>GREEN<br>CLICKER</h1>
+    <p>Click together. Grow the number.</p>
     <strong id="total" aria-live="polite">0</strong>
-    <button id="clicker" type="button">押せ！！！</button>
-    <p id="feed" aria-live="polite">世界中のクリックを待っています。</p>
+    <button id="clicker" type="button">CLICK IT!!!</button>
+    <p id="feed" aria-live="polite">Waiting for clicks from everywhere.</p>
   </main>
   <script>
     const total = document.querySelector('#total');
     const clicker = document.querySelector('#clicker');
     const feed = document.querySelector('#feed');
     let clicks = 0;
-    function draw() { total.textContent = clicks.toLocaleString('ja-JP'); }
-    function pop() { const item = document.createElement('span'); item.className = 'pop'; item.textContent = ['+1', 'ドン！', '混沌！', '⚡'][Math.floor(Math.random() * 4)]; item.style.left = `${20 + Math.random() * 60}%`; item.style.top = `${35 + Math.random() * 35}%`; item.addEventListener('animationend', () => item.remove()); document.body.append(item); }
+    function draw() { total.textContent = clicks.toLocaleString('en-US'); }
+    function pop() { const item = document.createElement('span'); item.className = 'pop'; item.textContent = ['+1', 'GREEN!', 'GO!', '⚡'][Math.floor(Math.random() * 4)]; item.style.left = `${20 + Math.random() * 60}%`; item.style.top = `${35 + Math.random() * 35}%`; item.addEventListener('animationend', () => item.remove()); document.body.append(item); }
     clicker.addEventListener('click', async () => { const response = await fetch('/api/clicker', { method: 'POST' }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; clicks = result.clicks; draw(); pop(); });
     fetch('/api/clicker').then((response) => response.json()).then((result) => { clicks = result.clicks || 0; draw(); });
-    const events = new EventSource('/api/comments/stream'); events.addEventListener('clicks', (event) => { clicks = JSON.parse(event.data).clicks; draw(); feed.textContent = '誰かが世界を1回押しました。'; });
+    const events = new EventSource('/api/comments/stream'); events.addEventListener('clicks', (event) => { clicks = JSON.parse(event.data).clicks; draw(); feed.textContent = 'Someone clicked the world.'; });
   </script>
 </body>
 </html>

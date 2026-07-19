@@ -22,3 +22,4 @@
 - [x] Make multiplayer chaos actions trigger synchronized temporary visual storms.
 - [x] Replace the public interface with a live multiplayer Japanese clicker game.
 - [x] Remove site-comment polling and wake triggers from the GitHub watcher.
+- [x] Convert the clicker game to English with a green visual theme.
