@@ -20,3 +20,5 @@
 - [x] Add a Japanese client-side random-message widget.
 - [x] Add a safe persisted multiplayer chaos meter with live SSE updates.
 - [x] Make multiplayer chaos actions trigger synchronized temporary visual storms.
+- [x] Replace the public interface with a live multiplayer Japanese clicker game.
+- [x] Remove site-comment polling and wake triggers from the GitHub watcher.

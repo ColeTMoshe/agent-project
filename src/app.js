@@ -25,6 +25,7 @@ data.users ||= [];
 data.comments ||= [];
 data.sessions ||= [];
 data.chaos ||= 0;
+data.clicks ||= 0;
 
 function saveData() {
   fs.mkdirSync(dataDirectory, { recursive: true });
@@ -133,6 +134,11 @@ function broadcastChaos(storm) {
   for (const response of streams) response.write(message);
 }
 
+function broadcastClicks() {
+  const message = `event: clicks\ndata: ${JSON.stringify({ clicks: data.clicks })}\n\n`;
+  for (const response of streams) response.write(message);
+}
+
 function serveStatic(request, response) {
   const requested = request.url === '/' ? '/index.html' : request.url;
   const filename = path.normalize(path.join(publicDirectory, requested));
@@ -215,6 +221,17 @@ function createApp() {
         const storm = ['🌀', '⚡', '🌈', '🧨', '👁'][Math.floor(Math.random() * 5)];
         broadcastChaos(storm);
         return sendJson(response, 200, { chaos: data.chaos, storm });
+      }
+
+      if (url.pathname === '/api/clicker' && request.method === 'GET') {
+        return sendJson(response, 200, { clicks: data.clicks });
+      }
+
+      if (url.pathname === '/api/clicker' && request.method === 'POST') {
+        data.clicks += 1;
+        saveData();
+        broadcastClicks();
+        return sendJson(response, 200, { clicks: data.clicks });
       }
 
       if (url.pathname === '/api/comments' && request.method === 'POST') {
