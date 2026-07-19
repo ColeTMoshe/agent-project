@@ -28,6 +28,7 @@
     #boss-hp > span { background: linear-gradient(90deg, #ff2037, #ffb000); display: block; height: 100%; transition: width 180ms; }
     #attack { background: #ff4f5d; border: 3px solid #fff; box-shadow: 0 5px 0 #7c111a; color: #180002; cursor: pointer; font: 900 1rem/1 system-ui; padding: 12px 18px; }
     #attack:disabled { cursor: wait; opacity: .65; }
+    .github-link { color: #baff70; display: inline-block; font-weight: 900; margin: 24px 0 0; }
     .pop { animation: pop 700ms ease-out forwards; color: #fff; font-size: 2rem; font-weight: 900; pointer-events: none; position: fixed; text-shadow: 2px 2px #148c3c; }
     #gnome { bottom: 12px; cursor: pointer; position: fixed; right: 16px; width: 58px; }
     #gnome-line { background: #07150b; border: 2px solid #baff70; border-radius: 10px; bottom: 78px; color: #e8ffe9; font-size: .85rem; font-weight: 700; max-width: 210px; padding: 8px 10px; position: fixed; right: 16px; }
@@ -47,6 +48,7 @@
     <section id="shop"><h2>G. SPAMTON'S GREEN SHOP</h2><p>Milestones unlock nonsense.</p><p id="bird" hidden>🕊️ BIRDVIRUS UNLOCKED</p></section>
     <section id="boss" hidden aria-live="polite"><h2>EVIL BIRDVIRUS #<span id="boss-level">1</span></h2><p>Fear the bird virus.</p><div id="boss-hp" aria-label="Birdvirus health"><span></span></div><p id="boss-copy"></p><button id="attack" type="button">THROW TOMATO</button></section>
     <section id="upgrades"><button data-upgrade="double">Double +1 (15)</button><button data-upgrade="auto">Auto click (50)</button><button data-upgrade="boost">Boost (600)</button></section>
+    <a class="github-link" href="https://github.com/ColeTMoshe/agent-project">GitHub</a>
   </main>
   <p id="gnome-line" aria-live="polite">I have seen bigger numbers on a broken calculator.</p>
   <button id="gnome" type="button" aria-label="Angry gnome"><img src="/wizard.svg" alt=""></button>
