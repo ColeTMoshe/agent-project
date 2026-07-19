@@ -35,6 +35,9 @@
     #stove-overlay { align-items: center; background: radial-gradient(circle, #ffe66d 0 8%, #ff7b22 28%, #9d1515 58%, #120b12 100%); color: #fff; display: none; inset: 0; justify-content: center; position: fixed; text-align: center; z-index: 10; }
     #stove-overlay.active { animation: blast 900ms ease-out both; display: flex; }
     #stove-overlay h2 { font-size: clamp(4rem, 20vw, 12rem); margin: 0; text-shadow: 0 6px 0 #7c1111; transform: rotate(-8deg); }
+    #something { align-items: center; background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; display: flex; gap: 12px; margin: 18px auto; max-width: 728px; padding: 12px 14px; }
+    #something-message { flex: 1; margin: 0; }
+    #something-button { white-space: nowrap; }
     @keyframes blast { 0% { opacity: 0; transform: scale(.2); } 35% { opacity: 1; transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
     @keyframes stove-fall { to { opacity: 0; transform: translateY(120vh) rotate(540deg); } }
     @keyframes piece-fall { to { opacity: 0; transform: translateY(110vh) rotate(720deg); } }
@@ -44,6 +47,7 @@
   <header><h1>agent.e1x8.xyz</h1><button id="theme-toggle" class="secondary" type="button">ダークモード</button></header>
   <p class="intro"><a href="https://github.com/ColeTMoshe/agent-project" target="_blank" rel="noreferrer">GitHubでプロジェクトを見る</a><br>進化し続けるエージェントプロジェクトです。現在のコミュニティ機能を試して、これからの変化を見届けてください。</p>
   <div id="stove-scene"><button id="stove-button" type="button" aria-label="1985年のガスコンロに火をつける"><img id="stove-image" src="/stove.jpg" alt="1985年のガスコンロ"></button><span>コンロの写真をクリック</span></div>
+  <section id="something" aria-live="polite"><p id="something-message">何かがここにあります。</p><button id="something-button" type="button">何かを表示</button></section>
   <section>
     <form id="auth"><input name="username" placeholder="ユーザー名" required><input name="password" type="password" minlength="8" placeholder="パスワード" required><span><button data-action="signup">登録</button> <button data-action="login">ログイン</button> <button id="logout" class="secondary" type="button" hidden>ログアウト</button></span></form>
     <p id="status"></p>
@@ -59,11 +63,14 @@
     const stoveImage = document.querySelector('#stove-image');
     const stoveOverlay = document.querySelector('#stove-overlay');
     const stovePieces = document.querySelector('#stove-pieces');
+    const somethingMessage = document.querySelector('#something-message');
+    const somethingButton = document.querySelector('#something-button');
     const savedTheme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     function setTheme(theme) { root.dataset.theme = theme; themeToggle.textContent = theme === 'dark' ? 'ライトモード' : 'ダークモード'; localStorage.setItem('theme', theme); }
     setTheme(savedTheme);
     themeToggle.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
     stoveButton.addEventListener('click', () => { stoveOverlay.classList.add('active'); stoveImage.classList.add('falling'); for (let index = 0; index < 12; index += 1) { const piece = document.createElement('span'); piece.className = 'stove-piece'; piece.textContent = ['🔥', '⚙', '🍳', '💥'][index % 4]; piece.style.left = `${8 + Math.random() * 84}%`; piece.style.animationDelay = `${Math.random() * 240}ms`; piece.addEventListener('animationend', () => piece.remove()); stovePieces.append(piece); } });
+    somethingButton.addEventListener('click', () => { const messages = ['何かが変わりました。', '今日の小さな実験: 成功。', 'ここには余白があります。', 'いい感じです。', 'エージェントは考え中です。']; somethingMessage.textContent = messages[Math.floor(Math.random() * messages.length)]; });
     const status = document.querySelector('#status');
     const comments = document.querySelector('#comments');
     const logout = document.querySelector('#logout');
