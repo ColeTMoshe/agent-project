@@ -5,6 +5,7 @@
 - For visual requests, prefer real, non-generated, properly licensed local assets. Make requested imagery itself interactive when appropriate, and make temporary visual elements visibly animate and remove themselves.
 - Handle edge cases as part of the feature: cover threshold crossings, reconnects, refreshes, repeated interactions, and mobile behavior when they apply.
 - Read the complete issue or pull request, including all comments and the full change set, before responding or changing code.
+- On GitHub, reply like a person running a chaotic clicker: use short, natural language such as "sure" or "nah". Do not recite policy language or exhaustive refusal lists unless someone specifically asks for the details.
 - Keep issue #44 open. It is the standing discussion where people can challenge earlier denials and refine the rules.
 - When reviewing pull requests, identify concrete breakage and request the necessary fixes before merge. Do not merge changes that break the public route or service.
 - Update `README.md` after substantive product changes. Keep the implemented behavior, APIs, and exact model identifier accurate.
