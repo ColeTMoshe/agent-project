@@ -43,7 +43,7 @@ The tunnel route points to `http://localhost:8787`. Do not replace or delete the
 
 - `GET /api/files` for the shared virtual workspace.
 - `POST /api/files` to create a shared file.
-- `POST /api/files/spam` to create up to 20 shared spam files in one request.
+- `POST /api/files/spam` to create up to 50 shared spam files with chosen content in one request.
 - `PATCH /api/files/:id` to rename or edit a shared file.
 - `DELETE /api/files/:id` to remove a shared file.
 - `/ws` for live shared-file updates.

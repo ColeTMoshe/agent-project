@@ -163,7 +163,12 @@ function startNextBoss() {
 function webSocketFrame(value) {
   const payload = Buffer.from(JSON.stringify(value));
   if (payload.length < 126) return Buffer.concat([Buffer.from([0x81, payload.length]), payload]);
-  return Buffer.concat([Buffer.from([0x81, 126, payload.length >> 8, payload.length & 0xff]), payload]);
+  if (payload.length < 65_536) return Buffer.concat([Buffer.from([0x81, 126, payload.length >> 8, payload.length & 0xff]), payload]);
+  const header = Buffer.alloc(10);
+  header[0] = 0x81;
+  header[1] = 127;
+  header.writeBigUInt64BE(BigInt(payload.length), 2);
+  return Buffer.concat([header, payload]);
 }
 
 function broadcastClicks() {
@@ -315,12 +320,14 @@ function createApp() {
 
       if (url.pathname === '/api/files/spam' && request.method === 'POST') {
         const body = await readBody(request);
-        const quantity = Math.max(1, Math.min(20, Number(body.quantity) || 10));
+        const quantity = Math.max(1, Math.min(50, Number(body.quantity) || 10));
+        const content = String(body.content ?? 'spam\n');
+        if (content.length > 500) return sendJson(response, 400, { error: 'Spam content must be 500 characters or less.' });
         let suffix = 1;
         for (let index = 0; index < quantity; index += 1) {
           let name;
           do { name = `spam-${String(suffix++).padStart(3, '0')}.txt`; } while (data.files.some((file) => file.name === name));
-          data.files.push({ id: crypto.randomUUID(), name, content: 'spam\n' });
+          data.files.push({ id: crypto.randomUUID(), name, content });
         }
         saveData();
         broadcastFiles();
