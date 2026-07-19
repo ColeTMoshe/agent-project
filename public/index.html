@@ -29,6 +29,7 @@
     #attack { background: #ff4f5d; border: 3px solid #fff; box-shadow: 0 5px 0 #7c111a; color: #180002; cursor: pointer; font: 900 1rem/1 system-ui; padding: 12px 18px; }
     #attack:disabled { cursor: wait; opacity: .65; }
     .github-link { color: #baff70; display: inline-block; font-weight: 900; margin: 24px 0 0; }
+    #frogification { align-items: center; background: #68b849; color: #06220b; display: flex; font: 900 clamp(7rem, 35vw, 27rem)/.7 system-ui; inset: 0; justify-content: center; opacity: 0; overflow: hidden; pointer-events: none; position: fixed; text-shadow: 8px 8px #baff70; transition: opacity 900ms linear; z-index: 10; }
     .pop { animation: pop 700ms ease-out forwards; color: #fff; font-size: 2rem; font-weight: 900; pointer-events: none; position: fixed; text-shadow: 2px 2px #148c3c; }
     #gnome { bottom: 12px; cursor: pointer; position: fixed; right: 16px; width: 58px; }
     #gnome-line { background: #07150b; border: 2px solid #baff70; border-radius: 10px; bottom: 78px; color: #e8ffe9; font-size: .85rem; font-weight: 700; max-width: 210px; padding: 8px 10px; position: fixed; right: 16px; }
@@ -52,6 +53,7 @@
   </main>
   <p id="gnome-line" aria-live="polite">I have seen bigger numbers on a broken calculator.</p>
   <button id="gnome" type="button" aria-label="Angry gnome"><img src="/wizard.svg" alt=""></button>
+  <div id="frogification" aria-hidden="true">FROG</div>
   <script>
     const total = document.querySelector('#total');
     const clicker = document.querySelector('#clicker');
@@ -65,12 +67,14 @@
     const bossHp = document.querySelector('#boss-hp > span');
     const bossCopy = document.querySelector('#boss-copy');
     const attack = document.querySelector('#attack');
+    const frogification = document.querySelector('#frogification');
     let clicks = 0;
     let lastClicks = 0;
     let bossState = { activeMilestone: 0, hp: 0, maxHp: 0 };
     let attacking = false;
     let clicking = false;
     let clickCooldownUntil = 0;
+    let frogness = 0;
     function draw() { total.textContent = clicks.toLocaleString('en-US'); document.title = `${clicks.toLocaleString('en-US')} - Green Clicker`; rewards.forEach((reward) => reward.classList.toggle('unlocked', clicks >= Number(reward.dataset.milestone))); bird.hidden = clicks < 50; boss.hidden = !bossState.activeMilestone; if (bossState.activeMilestone) { bossLevel.textContent = bossState.activeMilestone; bossHp.style.width = `${Math.max(0, bossState.hp / bossState.maxHp * 100)}%`; bossCopy.textContent = `${bossState.hp} / ${bossState.maxHp} fear points`; attack.disabled = attacking; } }
     function sync(result) { clicks = result.clicks || 0; bossState = result.boss || bossState; draw(); }
     function pop() { const item = document.createElement('span'); item.className = 'pop'; item.textContent = ['+1', 'GREEN!', 'GO!', '⚡'][Math.floor(Math.random() * 4)]; item.style.left = `${20 + Math.random() * 60}%`; item.style.top = `${35 + Math.random() * 35}%`; item.addEventListener('animationend', () => item.remove()); document.body.append(item); }
@@ -82,6 +86,7 @@
     fetch('/api/clicker').then((response) => response.json()).then(sync);
     function connect() { const socket = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`); socket.addEventListener('message', (event) => { const update = JSON.parse(event.data); if (update.type === 'clicks') { sync(update); feed.textContent = 'Someone clicked the world.'; } }); socket.addEventListener('close', () => setTimeout(connect, 1_000)); }
     connect();
+    setInterval(() => { frogness = Math.min(1, frogness + 1 / 75); frogification.style.opacity = frogness; }, 1_000);
     setInterval(() => { document.querySelector('#cps').textContent = `${clicks - lastClicks} clicks/sec`; lastClicks = clicks; }, 1000);
     document.addEventListener('keydown', (event) => { if (event.key.toLowerCase() === 'c' && !event.repeat && document.activeElement === document.body) clicker.click(); });
   </script>

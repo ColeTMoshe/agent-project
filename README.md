@@ -41,6 +41,7 @@ The tunnel route points to `http://localhost:8787`. Do not replace or delete the
 - G. SPAMTON'S GREEN SHOP panel and Birdvirus seagull unlock.
 - A shared Evil Birdvirus boss encounter every 1,000 clicks; any player can throw tomatoes until its shared health reaches zero.
 - A local wizard gnome with click-count-aware passive-aggressive dialogue and tomato throws.
+- A client-only frog takeover: after opening the page, it slowly becomes `FROG` and resets on refresh.
 - Machine-readable health status through `/healthz`.
 
 ## API
