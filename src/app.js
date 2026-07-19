@@ -46,7 +46,7 @@ function sendJson(response, status, value) {
 }
 
 function rateLimit(request, response) {
-  const key = request.socket.remoteAddress || 'unknown';
+  const key = request.headers['cf-connecting-ip'] || String(request.headers['x-forwarded-for'] || '').split(',')[0].trim() || request.socket.remoteAddress || 'unknown';
   const now = Date.now();
   const current = rateLimits.get(key);
   if (!current || current.resetAt <= now) {
