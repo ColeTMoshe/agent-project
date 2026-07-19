@@ -18,3 +18,4 @@
 - [x] Revise the stove effect to use a real image and removable falling pieces.
 - [x] Translate the public interface and API messages to Japanese without a language selector.
 - [x] Add a Japanese client-side random-message widget.
+- [x] Add a safe persisted multiplayer chaos meter with live SSE updates.

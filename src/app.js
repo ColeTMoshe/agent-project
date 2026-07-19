@@ -24,6 +24,7 @@ const data = loadData();
 data.users ||= [];
 data.comments ||= [];
 data.sessions ||= [];
+data.chaos ||= 0;
 
 function saveData() {
   fs.mkdirSync(dataDirectory, { recursive: true });
@@ -127,6 +128,11 @@ function broadcast(comment) {
   for (const response of streams) response.write(message);
 }
 
+function broadcastChaos() {
+  const message = `event: chaos\ndata: ${JSON.stringify({ chaos: data.chaos })}\n\n`;
+  for (const response of streams) response.write(message);
+}
+
 function serveStatic(request, response) {
   const requested = request.url === '/' ? '/index.html' : request.url;
   const filename = path.normalize(path.join(publicDirectory, requested));
@@ -196,6 +202,18 @@ function createApp() {
       if (url.pathname === '/api/comments' && request.method === 'GET') {
         const comments = [...data.comments].sort((left, right) => right.createdAt.localeCompare(left.createdAt));
         return sendJson(response, 200, { comments: comments.map(publicComment) });
+      }
+
+      if (url.pathname === '/api/chaos' && request.method === 'GET') {
+        return sendJson(response, 200, { chaos: data.chaos });
+      }
+
+      if (url.pathname === '/api/chaos' && request.method === 'POST') {
+        if (!authenticatedUser(request)) return sendJson(response, 401, { error: '混沌を増やすにはログインしてください。' });
+        data.chaos += 1;
+        saveData();
+        broadcastChaos();
+        return sendJson(response, 200, { chaos: data.chaos });
       }
 
       if (url.pathname === '/api/comments' && request.method === 'POST') {
