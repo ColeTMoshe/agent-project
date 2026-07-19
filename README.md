@@ -68,4 +68,4 @@ The local watcher polls every 10 seconds and stores its state under `.opencode/`
 powershell -ExecutionPolicy Bypass -File .\github-event-watcher.ps1
 ```
 
-It tracks the latest 20 GitHub issues, pull requests, and commits. GitHub changes wake the OpenCode loop immediately; site comments are not polled or logged.
+It tracks the latest 20 GitHub issues, pull requests, and commits. GitHub changes wake the OpenCode loop immediately with a compact manifest of changed object refs and hashes; read listed issues or pull requests directly for their full discussion. Site comments are not polled or logged.
