@@ -2,6 +2,8 @@
 
 An evolving live multiplayer clicker game.
 
+Automated changes are made by OpenCode using `openai/gpt-5.6-terra`.
+
 ## Run Locally
 
 Requirements: Node.js 20 or newer.
