@@ -3,92 +3,66 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Green Clicker</title>
+  <title>Shared Files</title>
   <style>
-    :root { background: #061b0d; color: #e8ffe9; font-family: system-ui, sans-serif; }
+    :root { background: #0b110b; color: #e7ffd6; font-family: ui-monospace, Consolas, monospace; }
     * { box-sizing: border-box; }
-    body { align-items: center; background: radial-gradient(circle at 50% 0, #19783a, #061b0d 55%); display: flex; margin: 0; min-height: 100vh; overflow-x: hidden; text-align: center; }
-    main { margin: auto; max-width: 680px; padding: 28px 18px; width: 100%; }
-    h1 { font-size: clamp(3rem, 12vw, 7rem); letter-spacing: -.08em; line-height: .82; margin: 0; text-shadow: 5px 5px 0 #0c3e1c, -4px -4px 0 #8cff5d; }
-    p { color: #a9e8ae; font-weight: 700; }
-    #total { color: #baff70; display: block; font-size: clamp(4rem, 18vw, 10rem); letter-spacing: -.08em; line-height: 1; text-shadow: 0 0 32px #2fff68; }
-    #clicker { aspect-ratio: 1; background: conic-gradient(#24d65e, #baff70, #a4ffbc, #087b35, #24d65e); border: 10px solid #e8ffe9; border-radius: 50%; box-shadow: 0 16px 0 #075020, 0 22px 45px #0009; color: #031108; cursor: pointer; font: 900 clamp(1.2rem, 5vw, 2.1rem)/1 system-ui; margin: 24px auto 34px; max-width: 300px; padding: 20px; transform: rotate(-4deg); transition: transform 80ms, box-shadow 80ms; width: 76vw; }
-    #clicker:active { box-shadow: 0 4px 0 #075020, 0 8px 20px #0009; transform: translateY(12px) rotate(4deg) scale(.96); }
-    #clicker:focus-visible { outline: 5px solid #fff; outline-offset: 7px; }
-    #feed { color: #baff70; min-height: 1.5em; }
-    #rewards { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 18px 0; }
-    .reward { background: #0c3e1c; border: 2px solid #287b42; border-radius: 999px; color: #7cae81; padding: 7px 11px; }
-    .reward.unlocked { border-color: #baff70; color: #e8ffe9; }
-    #shop { background: #07150b; border: 3px dashed #baff70; border-radius: 14px; color: #e8ffe9; margin: 22px auto 0; max-width: 390px; padding: 14px; }
-    #shop h2 { color: #baff70; font-size: 1.2rem; margin: 0 0 8px; }
-    #bird { font-size: 2rem; margin: 0; }
-    #boss { background: #27080c; border: 4px solid #ff4f5d; box-shadow: 0 0 30px #ff203766; margin: 22px auto; max-width: 390px; padding: 16px; }
-    #boss h2 { color: #ff8a8a; letter-spacing: .08em; margin: 0; }
-    #boss-hp { background: #120305; border: 2px solid #ff8a8a; height: 18px; margin: 12px 0; }
-    #boss-hp > span { background: linear-gradient(90deg, #ff2037, #ffb000); display: block; height: 100%; transition: width 180ms; }
-    #attack { background: #ff4f5d; border: 3px solid #fff; box-shadow: 0 5px 0 #7c111a; color: #180002; cursor: pointer; font: 900 1rem/1 system-ui; padding: 12px 18px; }
-    #attack:disabled { cursor: wait; opacity: .65; }
-    .github-link { color: #baff70; display: inline-block; font-weight: 900; margin: 24px 0 0; }
-    #frogification { align-items: center; background: #68b849; color: #06220b; display: flex; font: 900 clamp(7rem, 35vw, 27rem)/.7 system-ui; inset: 0; justify-content: center; opacity: 0; overflow: hidden; pointer-events: none; position: fixed; text-shadow: 8px 8px #baff70; transition: opacity 900ms linear; z-index: 10; }
-    .pop { animation: pop 700ms ease-out forwards; color: #fff; font-size: 2rem; font-weight: 900; pointer-events: none; position: fixed; text-shadow: 2px 2px #148c3c; }
-    #gnome { bottom: 12px; cursor: pointer; position: fixed; right: 16px; width: 58px; }
-    #gnome-line { background: #07150b; border: 2px solid #baff70; border-radius: 10px; bottom: 78px; color: #e8ffe9; font-size: .85rem; font-weight: 700; max-width: 210px; padding: 8px 10px; position: fixed; right: 16px; }
-    @keyframes pop { to { opacity: 0; transform: translateY(-110px) rotate(30deg) scale(1.8); } }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+    body { background: radial-gradient(circle at 15% 0, #254d20, #0b110b 48%); margin: 0; min-height: 100vh; }
+    main { margin: auto; max-width: 1100px; padding: 28px 18px; }
+    header { align-items: baseline; display: flex; flex-wrap: wrap; gap: 10px 20px; justify-content: space-between; }
+    h1 { color: #a9ff55; font: 900 clamp(2rem, 8vw, 4rem)/.9 system-ui; letter-spacing: -.07em; margin: 0; text-shadow: 4px 4px #163714; }
+    #status { color: #a9ff55; font-weight: 700; margin: 0; }
+    #workspace { border: 2px solid #70b35e; display: grid; grid-template-columns: minmax(180px, 280px) 1fr; margin-top: 24px; min-height: 570px; }
+    aside { background: #101b0f; border-right: 2px solid #70b35e; padding: 14px; }
+    .bar { display: flex; gap: 8px; justify-content: space-between; }
+    button { background: #a9ff55; border: 2px solid #edffdb; box-shadow: 3px 3px #315b28; color: #0b1809; cursor: pointer; font: 800 .85rem/1 ui-monospace, monospace; padding: 9px 11px; }
+    button:disabled { cursor: wait; opacity: .55; }
+    #files { list-style: none; margin: 14px 0 0; padding: 0; }
+    #files button { background: transparent; border: 0; box-shadow: none; color: #c9f6bd; overflow: hidden; padding: 10px 4px; text-align: left; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+    #files button.active { color: #a9ff55; text-decoration: underline; }
+    #editor { display: grid; grid-template-rows: auto 1fr auto; min-width: 0; padding: 14px; }
+    #name, #content { background: #071006; border: 2px solid #4f8b42; color: #edffdb; font: 1rem/1.4 ui-monospace, Consolas, monospace; width: 100%; }
+    #name { padding: 10px; }
+    #content { margin-top: 12px; padding: 14px; resize: none; }
+    #content:disabled, #name:disabled { opacity: .5; }
+    #actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+    #delete { background: #ff9c88; }
+    .github-link { color: #a9ff55; display: inline-block; font-weight: 900; margin-top: 18px; }
+    @media (max-width: 650px) { #workspace { grid-template-columns: 1fr; } aside { border-bottom: 2px solid #70b35e; border-right: 0; } #files { display: flex; gap: 10px; overflow-x: auto; } #files button { min-width: max-content; } #workspace { min-height: 620px; } }
   </style>
 </head>
 <body>
   <main>
-    <h1>G. SPAMTON'S<br>GREEN CLICKER</h1>
-    <p>Click together. Grow the number.</p>
-    <strong id="total" aria-live="polite">0</strong>
-    <button id="clicker" type="button">CLICK IT!!!</button>
-    <p id="feed" aria-live="polite">Waiting for clicks from everywhere.</p>
-    <p id="cps">0 clicks/sec</p>
-    <section id="rewards" aria-label="Milestone rewards"><span class="reward" data-milestone="10">10: Greenhorn</span><span class="reward" data-milestone="50">50: Birdvirus</span><span class="reward" data-milestone="100">100: Big Shot</span></section>
-    <section id="shop"><h2>G. SPAMTON'S GREEN SHOP</h2><p>Milestones unlock nonsense.</p><p id="bird" hidden>🕊️ BIRDVIRUS UNLOCKED</p></section>
-    <section id="boss" hidden aria-live="polite"><h2>EVIL BIRDVIRUS #<span id="boss-level">1</span></h2><p>Fear the bird virus.</p><div id="boss-hp" aria-label="Birdvirus health"><span></span></div><p id="boss-copy"></p><button id="attack" type="button">THROW TOMATO</button></section>
-    <section id="upgrades"><button data-upgrade="double">Double +1 (15)</button><button data-upgrade="auto">Auto click (50)</button><button data-upgrade="boost">Boost (600)</button></section>
+    <header><h1>SHARED FILES</h1><p id="status" aria-live="polite">Connecting...</p></header>
+    <section id="workspace" aria-label="Shared file manager">
+      <aside><div class="bar"><strong>FILES</strong><button id="new-file" type="button">+ NEW</button></div><ul id="files"></ul></aside>
+      <section id="editor"><input id="name" aria-label="File name" disabled><textarea id="content" aria-label="File content" disabled spellcheck="false"></textarea><div id="actions"><button id="delete" type="button" disabled>DELETE</button><button id="save" type="button" disabled>SAVE</button></div></section>
+    </section>
     <a class="github-link" href="https://github.com/ColeTMoshe/agent-project">GitHub</a>
   </main>
-  <p id="gnome-line" aria-live="polite">I have seen bigger numbers on a broken calculator.</p>
-  <button id="gnome" type="button" aria-label="Angry gnome"><img src="/wizard.svg" alt=""></button>
-  <div id="frogification" aria-hidden="true">FROG</div>
   <script>
-    const total = document.querySelector('#total');
-    const clicker = document.querySelector('#clicker');
-    const feed = document.querySelector('#feed');
-    const rewards = [...document.querySelectorAll('.reward')];
-    const bird = document.querySelector('#bird');
-    const gnome = document.querySelector('#gnome');
-    const gnomeLine = document.querySelector('#gnome-line');
-    const boss = document.querySelector('#boss');
-    const bossLevel = document.querySelector('#boss-level');
-    const bossHp = document.querySelector('#boss-hp > span');
-    const bossCopy = document.querySelector('#boss-copy');
-    const attack = document.querySelector('#attack');
-    const frogification = document.querySelector('#frogification');
-    let clicks = 0;
-    let lastClicks = 0;
-    let bossState = { activeMilestone: 0, hp: 0, maxHp: 0 };
-    let attacking = false;
-    let clicking = false;
-    let clickCooldownUntil = 0;
-    let frogness = 0;
-    function draw() { total.textContent = clicks.toLocaleString('en-US'); document.title = `${clicks.toLocaleString('en-US')} - Green Clicker`; rewards.forEach((reward) => reward.classList.toggle('unlocked', clicks >= Number(reward.dataset.milestone))); bird.hidden = clicks < 50; boss.hidden = !bossState.activeMilestone; if (bossState.activeMilestone) { bossLevel.textContent = bossState.activeMilestone; bossHp.style.width = `${Math.max(0, bossState.hp / bossState.maxHp * 100)}%`; bossCopy.textContent = `${bossState.hp} / ${bossState.maxHp} fear points`; attack.disabled = attacking; } }
-    function sync(result) { clicks = result.clicks || 0; bossState = result.boss || bossState; draw(); }
-    function pop() { const item = document.createElement('span'); item.className = 'pop'; item.textContent = ['+1', 'GREEN!', 'GO!', '⚡'][Math.floor(Math.random() * 4)]; item.style.left = `${20 + Math.random() * 60}%`; item.style.top = `${35 + Math.random() * 35}%`; item.addEventListener('animationend', () => item.remove()); document.body.append(item); }
-    function roast() { const lines = clicks < 10 ? ['That is your number? Ambitious.', 'I have counted more tomatoes than that.', 'Keep going. I am barely judging you.'] : clicks < 50 ? ['Slowly becoming less embarrassing.', 'A respectable warm-up, I suppose.', 'The button is doing most of the work.'] : clicks < 100 ? ['Birdvirus is impressed. I am not.', 'Almost a big shot. Almost.', 'You are clicking with adequate enthusiasm.'] : ['Finally, a number worth throwing tomatoes at.', 'Big number. Tiny ego, please.', 'Not bad. Do not make this a personality.']; gnomeLine.textContent = lines[Math.floor(Math.random() * lines.length)]; }
-    gnome.addEventListener('click', () => { const tomato = document.createElement('img'); tomato.className = 'pop'; tomato.src = '/tomato.svg'; tomato.alt = ''; tomato.style.left = '82%'; tomato.style.top = '78%'; tomato.addEventListener('animationend', () => tomato.remove()); document.body.append(tomato); roast(); });
-    clicker.addEventListener('click', async () => { if (clicking || Date.now() < clickCooldownUntil) return; clicking = true; const response = await fetch('/api/clicker', { method: 'POST' }); const result = await response.json(); clicking = false; if (!response.ok) { const retryAfter = Number(result.retryAfter || response.headers.get('retry-after') || 0); if (retryAfter) { clickCooldownUntil = Date.now() + retryAfter * 1_000; feed.textContent = `Too fast. Try again in ${retryAfter}s.`; setTimeout(() => { if (Date.now() >= clickCooldownUntil) feed.textContent = 'CLICK IT!!!'; }, retryAfter * 1_000); } else feed.textContent = result.error || 'Click failed.'; return; } sync(result); pop(); roast(); });
-    attack.addEventListener('click', async () => { if (attacking) return; attacking = true; draw(); const response = await fetch('/api/clicker/boss', { method: 'POST' }); const result = await response.json(); attacking = false; if (!response.ok) return feed.textContent = result.error; sync(result); pop(); feed.textContent = result.boss.activeMilestone ? 'Birdvirus screeches.' : 'Birdvirus fled the clicker.'; });
-    document.querySelector('#upgrades').addEventListener('click', async (event) => { const type = event.target.dataset.upgrade; if (!type) return; const response = await fetch('/api/clicker/upgrade', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ type }) }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; sync(result); });
-    fetch('/api/clicker').then((response) => response.json()).then(sync);
-    function connect() { const socket = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`); socket.addEventListener('message', (event) => { const update = JSON.parse(event.data); if (update.type === 'clicks') { sync(update); feed.textContent = 'Someone clicked the world.'; } }); socket.addEventListener('close', () => setTimeout(connect, 1_000)); }
+    const status = document.querySelector('#status');
+    const fileList = document.querySelector('#files');
+    const name = document.querySelector('#name');
+    const content = document.querySelector('#content');
+    const newFile = document.querySelector('#new-file');
+    const save = document.querySelector('#save');
+    const remove = document.querySelector('#delete');
+    let files = [];
+    let selectedId = null;
+    let dirty = false;
+    function selected() { return files.find((file) => file.id === selectedId); }
+    function draw() { if (!selected() && files.length) selectedId = files[0].id; const file = selected(); fileList.replaceChildren(...files.map((item) => { const button = document.createElement('button'); button.type = 'button'; button.textContent = item.name; button.classList.toggle('active', item.id === selectedId); button.addEventListener('click', () => { selectedId = item.id; dirty = false; draw(); }); const line = document.createElement('li'); line.append(button); return line; })); name.disabled = !file; content.disabled = !file; save.disabled = !file; remove.disabled = !file; if (!file) { name.value = ''; content.value = ''; return; } name.value = file.name; if (!dirty) content.value = file.content; }
+    function sync(update) { const previousId = selectedId; files = update.files || []; if (!selected()) selectedId = files[0]?.id || null; if (selectedId !== previousId) dirty = false; draw(); }
+    async function request(url, options) { const response = await fetch(url, options); const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Request failed.'); return result; }
+    newFile.addEventListener('click', async () => { const base = 'untitled.txt'; let suffix = 1; let fileName = base; while (files.some((file) => file.name === fileName)) fileName = `untitled-${suffix++}.txt`; try { sync(await request('/api/files', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: fileName }) })); selectedId = files.find((file) => file.name === fileName)?.id || selectedId; draw(); status.textContent = 'New shared file.'; } catch (error) { status.textContent = error.message; } });
+    content.addEventListener('input', () => { dirty = true; status.textContent = 'Unsaved changes.'; });
+    name.addEventListener('input', () => { dirty = true; status.textContent = 'Unsaved changes.'; });
+    save.addEventListener('click', async () => { const file = selected(); if (!file) return; save.disabled = true; try { sync(await request(`/api/files/${file.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: name.value, content: content.value }) })); dirty = false; status.textContent = 'Saved for everyone.'; } catch (error) { status.textContent = error.message; } draw(); });
+    remove.addEventListener('click', async () => { const file = selected(); if (!file) return; remove.disabled = true; try { sync(await request(`/api/files/${file.id}`, { method: 'DELETE' })); dirty = false; status.textContent = 'Deleted for everyone.'; } catch (error) { status.textContent = error.message; } draw(); });
+    fetch('/api/files').then((response) => response.json()).then(sync).catch((error) => { status.textContent = error.message; });
+    function connect() { const socket = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`); socket.addEventListener('open', () => { status.textContent = 'Live workspace connected.'; }); socket.addEventListener('message', (event) => { const update = JSON.parse(event.data); if (update.type === 'files') { sync(update); if (!dirty) status.textContent = 'Someone changed the workspace.'; } }); socket.addEventListener('close', () => { status.textContent = 'Reconnecting...'; setTimeout(connect, 1_000); }); }
     connect();
-    setInterval(() => { frogness = Math.min(1, frogness + 1 / 75); frogification.style.opacity = frogness; }, 1_000);
-    setInterval(() => { document.querySelector('#cps').textContent = `${clicks - lastClicks} clicks/sec`; lastClicks = clicks; }, 1000);
-    document.addEventListener('keydown', (event) => { if (event.key.toLowerCase() === 'c' && !event.repeat && document.activeElement === document.body) clicker.click(); });
   </script>
 </body>
 </html>

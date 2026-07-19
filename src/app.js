@@ -29,6 +29,7 @@ data.chaos ||= 0;
 data.clicks ||= 0;
 data.upgrades ||= { double: 0, auto: 0, boost: 0, rebirths: 0 };
 data.boss ||= { activeMilestone: 0, clearedThrough: 0, hp: 0, maxHp: 0 };
+data.files ||= [{ id: crypto.randomUUID(), name: 'welcome.txt', content: 'This is a shared virtual workspace.\nOpen it somewhere else and edit together.\n' }];
 data.boss.activeMilestone ||= 0;
 data.boss.clearedThrough ||= 0;
 data.boss.hp ||= 0;
@@ -146,6 +147,10 @@ function clickerState() {
   return { clicks: data.clicks, upgrades: data.upgrades, boss: data.boss };
 }
 
+function fileState() {
+  return { files: data.files };
+}
+
 function startNextBoss() {
   const eligibleMilestone = Math.floor(data.clicks / 1_000);
   if (data.boss.activeMilestone || eligibleMilestone <= data.boss.clearedThrough) return false;
@@ -165,6 +170,11 @@ function broadcastClicks() {
   const message = `event: clicks\ndata: ${JSON.stringify({ clicks: data.clicks })}\n\n`;
   for (const response of streams) response.write(message);
   const frame = webSocketFrame({ type: 'clicks', ...clickerState() });
+  for (const socket of sockets) socket.write(frame);
+}
+
+function broadcastFiles() {
+  const frame = webSocketFrame({ type: 'files', ...fileState() });
   for (const socket of sockets) socket.write(frame);
 }
 
@@ -286,6 +296,45 @@ function createApp() {
         saveData();
         broadcastClicks();
         return sendJson(response, 200, clickerState());
+      }
+
+      if (url.pathname === '/api/files' && request.method === 'GET') {
+        return sendJson(response, 200, fileState());
+      }
+
+      if (url.pathname === '/api/files' && request.method === 'POST') {
+        const body = await readBody(request);
+        const name = String(body.name || '').trim();
+        if (!name || name.length > 64) return sendJson(response, 400, { error: 'File names must be 1 to 64 characters.' });
+        if (data.files.some((file) => file.name.toLowerCase() === name.toLowerCase())) return sendJson(response, 409, { error: 'That file already exists.' });
+        data.files.push({ id: crypto.randomUUID(), name, content: '' });
+        saveData();
+        broadcastFiles();
+        return sendJson(response, 201, fileState());
+      }
+
+      const fileMatch = url.pathname.match(/^\/api\/files\/([^/]+)$/);
+      if (fileMatch) {
+        const file = data.files.find((candidate) => candidate.id === fileMatch[1]);
+        if (!file) return sendJson(response, 404, { error: 'File not found.' });
+        if (request.method === 'PATCH') {
+          const body = await readBody(request);
+          const name = String(body.name || '').trim();
+          const content = String(body.content || '');
+          if (!name || name.length > 64 || content.length > 16_000) return sendJson(response, 400, { error: 'Use a 1 to 64 character name and content under 16,000 characters.' });
+          if (data.files.some((candidate) => candidate.id !== file.id && candidate.name.toLowerCase() === name.toLowerCase())) return sendJson(response, 409, { error: 'That file already exists.' });
+          file.name = name;
+          file.content = content;
+          saveData();
+          broadcastFiles();
+          return sendJson(response, 200, fileState());
+        }
+        if (request.method === 'DELETE') {
+          data.files = data.files.filter((candidate) => candidate.id !== file.id);
+          saveData();
+          broadcastFiles();
+          return sendJson(response, 200, fileState());
+        }
       }
 
       if (url.pathname === '/api/comments' && request.method === 'POST') {

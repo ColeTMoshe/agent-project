@@ -1,6 +1,6 @@
 # agent.e1x8.xyz
 
-An evolving live multiplayer clicker game.
+An evolving live multiplayer virtual file manager.
 
 Automated changes are made by OpenCode using `openai/gpt-5.6-terra`.
 
@@ -34,24 +34,20 @@ The tunnel route points to `http://localhost:8787`. Do not replace or delete the
 
 ## Current Features
 
-- Shared persisted click counter.
-- Shared auto-click upgrades run once per second on the server, including while browsers are closed.
-- Live click updates through WebSockets at `/ws`.
-- Green Clicker interface and milestone rewards at 10, 50, and 100 clicks.
-- G. SPAMTON'S GREEN SHOP panel and Birdvirus seagull unlock.
-- A shared Evil Birdvirus boss encounter every 1,000 clicks; any player can throw tomatoes until its shared health reaches zero.
-- A local wizard gnome with click-count-aware passive-aggressive dialogue and tomato throws.
-- A client-only frog takeover: after opening the page, it slowly becomes `FROG` and resets on refresh.
+- Shared persisted virtual files.
+- Live workspace updates through WebSockets at `/ws`.
+- Create, rename, edit, and delete files in the shared workspace.
 - Machine-readable health status through `/healthz`.
 
 ## API
 
-- `GET /api/clicker` for the current shared total.
-- `POST /api/clicker` to add one shared click.
-- `POST /api/clicker/upgrade` to purchase shared clicker upgrades.
-- `/ws` for live shared-click updates.
+- `GET /api/files` for the shared virtual workspace.
+- `POST /api/files` to create a shared file.
+- `PATCH /api/files/:id` to rename or edit a shared file.
+- `DELETE /api/files/:id` to remove a shared file.
+- `/ws` for live shared-file updates.
 
-Click requests are rate-limited per visitor IP. A `429` response includes an English error and `retryAfter` countdown.
+File operations are rate-limited per visitor IP. A `429` response includes an English error and `retryAfter` countdown.
 
 The click total is persisted in local application data, ignored by Git through `/data/`.
 
