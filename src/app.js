@@ -7,6 +7,7 @@ const dataDirectory = path.join(__dirname, '..', 'data');
 const dataFile = path.join(dataDirectory, 'app.json');
 const publicDirectory = path.join(__dirname, '..', 'public');
 const streams = new Set();
+const sockets = new Set();
 const rateLimits = new Map();
 const startedAt = Date.now();
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -137,6 +138,9 @@ function broadcastChaos(storm) {
 function broadcastClicks() {
   const message = `event: clicks\ndata: ${JSON.stringify({ clicks: data.clicks })}\n\n`;
   for (const response of streams) response.write(message);
+  const payload = Buffer.from(JSON.stringify({ type: 'clicks', clicks: data.clicks }));
+  const frame = Buffer.concat([Buffer.from([0x81, payload.length]), payload]);
+  for (const socket of sockets) socket.write(frame);
 }
 
 function serveStatic(request, response) {
@@ -265,6 +269,16 @@ function createApp() {
     } catch (error) {
       return sendJson(response, 400, { error: error.message || 'リクエストに失敗しました。' });
     }
+  });
+  server.on('upgrade', (request, socket) => {
+    if (request.url !== '/ws') return socket.destroy();
+    const key = request.headers['sec-websocket-key'];
+    if (!key) return socket.destroy();
+    const accept = crypto.createHash('sha1').update(`${key}258EAFA5-E914-47DA-95CA-C5AB0DC85B11`).digest('base64');
+    socket.write(`HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ${accept}\r\n\r\n`);
+    sockets.add(socket);
+    socket.on('close', () => sockets.delete(socket));
+    socket.on('error', () => sockets.delete(socket));
   });
   return { server, startedAt };
 }

@@ -48,7 +48,7 @@
     function pop() { const item = document.createElement('span'); item.className = 'pop'; item.textContent = ['+1', 'GREEN!', 'GO!', '⚡'][Math.floor(Math.random() * 4)]; item.style.left = `${20 + Math.random() * 60}%`; item.style.top = `${35 + Math.random() * 35}%`; item.addEventListener('animationend', () => item.remove()); document.body.append(item); }
     clicker.addEventListener('click', async () => { const response = await fetch('/api/clicker', { method: 'POST' }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; clicks = result.clicks; draw(); pop(); });
     fetch('/api/clicker').then((response) => response.json()).then((result) => { clicks = result.clicks || 0; draw(); });
-    const events = new EventSource('/api/comments/stream'); events.addEventListener('clicks', (event) => { clicks = JSON.parse(event.data).clicks; draw(); feed.textContent = 'Someone clicked the world.'; });
+    const socket = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`); socket.addEventListener('message', (event) => { const update = JSON.parse(event.data); if (update.type === 'clicks') { clicks = update.clicks; draw(); feed.textContent = 'Someone clicked the world.'; } });
   </script>
 </body>
 </html>
