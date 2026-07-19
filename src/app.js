@@ -313,6 +313,20 @@ function createApp() {
         return sendJson(response, 201, fileState());
       }
 
+      if (url.pathname === '/api/files/spam' && request.method === 'POST') {
+        const body = await readBody(request);
+        const quantity = Math.max(1, Math.min(20, Number(body.quantity) || 10));
+        let suffix = 1;
+        for (let index = 0; index < quantity; index += 1) {
+          let name;
+          do { name = `spam-${String(suffix++).padStart(3, '0')}.txt`; } while (data.files.some((file) => file.name === name));
+          data.files.push({ id: crypto.randomUUID(), name, content: 'spam\n' });
+        }
+        saveData();
+        broadcastFiles();
+        return sendJson(response, 201, fileState());
+      }
+
       const fileMatch = url.pathname.match(/^\/api\/files\/([^/]+)$/);
       if (fileMatch) {
         const file = data.files.find((candidate) => candidate.id === fileMatch[1]);

@@ -28,14 +28,14 @@
     #actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
     #delete { background: #ff9c88; }
     .github-link { color: #a9ff55; display: inline-block; font-weight: 900; margin-top: 18px; }
-    @media (max-width: 650px) { #workspace { grid-template-columns: 1fr; } aside { border-bottom: 2px solid #70b35e; border-right: 0; } #files { display: flex; gap: 10px; overflow-x: auto; } #files button { min-width: max-content; } #workspace { min-height: 620px; } }
+    @media (max-width: 650px) { #workspace { grid-template-columns: 1fr; } aside { border-bottom: 2px solid #70b35e; border-right: 0; } #files { display: block; overflow: visible; } #files button { min-width: 0; } #workspace { min-height: 620px; } }
   </style>
 </head>
 <body>
   <main>
     <header><h1>SHARED FILES</h1><p id="status" aria-live="polite">Connecting...</p></header>
     <section id="workspace" aria-label="Shared file manager">
-      <aside><div class="bar"><strong>FILES</strong><button id="new-file" type="button">+ NEW</button></div><ul id="files"></ul></aside>
+      <aside><div class="bar"><strong>FILES</strong><button id="new-file" type="button">+ NEW</button><button id="spam-files" type="button">SPAM 10</button></div><ul id="files"></ul></aside>
       <section id="editor"><input id="name" aria-label="File name" disabled><textarea id="content" aria-label="File content" disabled spellcheck="false"></textarea><div id="actions"><button id="delete" type="button" disabled>DELETE</button><button id="save" type="button" disabled>SAVE</button></div></section>
     </section>
     <a class="github-link" href="https://github.com/ColeTMoshe/agent-project">GitHub</a>
@@ -46,6 +46,7 @@
     const name = document.querySelector('#name');
     const content = document.querySelector('#content');
     const newFile = document.querySelector('#new-file');
+    const spamFiles = document.querySelector('#spam-files');
     const save = document.querySelector('#save');
     const remove = document.querySelector('#delete');
     let files = [];
@@ -56,6 +57,7 @@
     function sync(update) { const previousId = selectedId; files = update.files || []; if (!selected()) selectedId = files[0]?.id || null; if (selectedId !== previousId) dirty = false; draw(); }
     async function request(url, options) { const response = await fetch(url, options); const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Request failed.'); return result; }
     newFile.addEventListener('click', async () => { const base = 'untitled.txt'; let suffix = 1; let fileName = base; while (files.some((file) => file.name === fileName)) fileName = `untitled-${suffix++}.txt`; try { sync(await request('/api/files', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: fileName }) })); selectedId = files.find((file) => file.name === fileName)?.id || selectedId; draw(); status.textContent = 'New shared file.'; } catch (error) { status.textContent = error.message; } });
+    spamFiles.addEventListener('click', async () => { spamFiles.disabled = true; try { sync(await request('/api/files/spam', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ quantity: 10 }) })); status.textContent = 'Ten shared spam files deployed.'; } catch (error) { status.textContent = error.message; } spamFiles.disabled = false; });
     content.addEventListener('input', () => { dirty = true; status.textContent = 'Unsaved changes.'; });
     name.addEventListener('input', () => { dirty = true; status.textContent = 'Unsaved changes.'; });
     save.addEventListener('click', async () => { const file = selected(); if (!file) return; save.disabled = true; try { sync(await request(`/api/files/${file.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: name.value, content: content.value }) })); dirty = false; status.textContent = 'Saved for everyone.'; } catch (error) { status.textContent = error.message; } draw(); });
