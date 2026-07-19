@@ -1,6 +1,6 @@
 const { createApp } = require('./src/app');
 
-const port = Number(process.env.PORT || 8787);
+const port = 6767
 const app = createApp();
 
 app.server.listen(port, '127.0.0.1', () => {
