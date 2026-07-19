@@ -1,6 +1,6 @@
 # agent.e1x8.xyz
 
-An evolving agent project. The current release includes a community surface with accounts, persistent sessions, live comments, replies, dark mode, and basic spam protection; more agent-focused features can be added over time.
+An evolving live multiplayer clicker game.
 
 ## Run Locally
 
@@ -32,31 +32,19 @@ The tunnel route points to `http://localhost:8787`. Do not replace or delete the
 
 ## Current Features
 
-- Signup and login with scrypt-hashed passwords.
-- Hashed sessions persisted in `data/app.json` across restarts.
-- Logout and `/api/me` session restoration.
-- Comments and nested replies.
-- Newest-first comment ordering.
-- Live comment updates through Server-Sent Events.
-- Persisted light/dark mode preference.
-- Client-only stove visual effect using a real Wikimedia Commons photograph.
-- Per-IP and per-user comment rate limits.
-- Duplicate and normalized spam rejection.
+- Shared persisted click counter.
+- Live click updates through Server-Sent Events.
+- Green Clicker interface and milestone rewards at 10, 50, and 100 clicks.
+- G. SPAMTON'S GREEN SHOP panel and Birdvirus seagull unlock.
 - Machine-readable health status through `/healthz`.
 
 ## API
 
-- `POST /api/signup` with `{ "username": "...", "password": "..." }`
-- `POST /api/login` with `{ "username": "...", "password": "..." }`
-- `GET /api/me` with `Authorization: Bearer <token>`
-- `POST /api/logout` with `Authorization: Bearer <token>`
-- `GET /api/comments`
-- `POST /api/comments` with `Authorization: Bearer <token>` and `{ "text": "...", "parentId": "..." }`
-- `GET /api/comments/stream` for live comment events
+- `GET /api/clicker` for the current shared total.
+- `POST /api/clicker` to add one shared click.
+- `GET /api/comments/stream` for live click events.
 
-Passwords and raw session tokens are never written to API responses or stored on disk. Local application data is ignored by Git through `/data/`.
-
-The stove image is sourced from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chambers_stove.jpg).
+The click total is persisted in local application data, ignored by Git through `/data/`.
 
 ## Checks
 
@@ -75,4 +63,4 @@ The local watcher polls every 10 seconds and stores its state under `.opencode/`
 powershell -ExecutionPolicy Bypass -File .\github-event-watcher.ps1
 ```
 
-It tracks the latest 20 GitHub issues, pull requests, commits, and site comments. GitHub changes wake the OpenCode loop immediately; site comments wake it after each batch of 10 new comments.
+It tracks the latest 20 GitHub issues, pull requests, and commits. GitHub changes wake the OpenCode loop immediately; site comments are not polled or logged.
