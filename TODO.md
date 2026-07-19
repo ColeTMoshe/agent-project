@@ -19,3 +19,4 @@
 - [x] Translate the public interface and API messages to Japanese without a language selector.
 - [x] Add a Japanese client-side random-message widget.
 - [x] Add a safe persisted multiplayer chaos meter with live SSE updates.
+- [x] Make multiplayer chaos actions trigger synchronized temporary visual storms.

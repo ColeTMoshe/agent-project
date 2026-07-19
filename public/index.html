@@ -42,9 +42,14 @@
     #chaos strong { font-size: 1.7rem; }
     #chaos-status { flex: 1; margin: 0; }
     #chaos-button { background: #fff; color: #5d176b; white-space: nowrap; }
+    #chaos-storm { inset: 0; overflow: hidden; pointer-events: none; position: fixed; z-index: 20; }
+    .chaos-spark { animation: chaos-drop 1.8s cubic-bezier(.2,.8,.4,1) forwards; font-size: clamp(1.5rem, 5vw, 3.5rem); position: absolute; top: -12vh; text-shadow: 0 3px 8px #0008; }
+    body.chaos-shaking { animation: chaos-rumble 130ms linear 7; }
     @keyframes blast { 0% { opacity: 0; transform: scale(.2); } 35% { opacity: 1; transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
     @keyframes stove-fall { to { opacity: 0; transform: translateY(120vh) rotate(540deg); } }
     @keyframes piece-fall { to { opacity: 0; transform: translateY(110vh) rotate(720deg); } }
+    @keyframes chaos-drop { to { opacity: 0; transform: translateY(125vh) rotate(960deg) scale(.25); } }
+    @keyframes chaos-rumble { 25% { transform: translate(7px, -4px) rotate(.3deg); } 75% { transform: translate(-7px, 4px) rotate(-.3deg); } }
   </style>
 </head>
 <body>
@@ -59,7 +64,7 @@
   </section>
   <form id="comment-form"><textarea name="text" maxlength="500" placeholder="コメントを書く... 😀" required></textarea><input name="parentId" type="hidden"><button>コメントを投稿</button></form>
   <main id="comments"></main>
-   <div id="stove-overlay" role="status" aria-live="assertive"><h2>ドカン！</h2></div><div id="stove-pieces"></div>
+  <div id="stove-overlay" role="status" aria-live="assertive"><h2>ドカン！</h2></div><div id="stove-pieces"></div><div id="chaos-storm" aria-hidden="true"></div>
   <script>
     const state = { token: localStorage.getItem('token'), comments: [], chaos: 0 };
     const root = document.documentElement;
@@ -72,6 +77,7 @@
     const somethingButton = document.querySelector('#something-button');
     const chaosValue = document.querySelector('#chaos-value');
     const chaosButton = document.querySelector('#chaos-button');
+    const chaosStorm = document.querySelector('#chaos-storm');
     const savedTheme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     function setTheme(theme) { root.dataset.theme = theme; themeToggle.textContent = theme === 'dark' ? 'ライトモード' : 'ダークモード'; localStorage.setItem('theme', theme); }
     setTheme(savedTheme);
@@ -79,6 +85,7 @@
     stoveButton.addEventListener('click', () => { stoveOverlay.classList.add('active'); stoveImage.classList.add('falling'); for (let index = 0; index < 12; index += 1) { const piece = document.createElement('span'); piece.className = 'stove-piece'; piece.textContent = ['🔥', '⚙', '🍳', '💥'][index % 4]; piece.style.left = `${8 + Math.random() * 84}%`; piece.style.animationDelay = `${Math.random() * 240}ms`; piece.addEventListener('animationend', () => piece.remove()); stovePieces.append(piece); } });
     somethingButton.addEventListener('click', () => { const messages = ['何かが変わりました。', '今日の小さな実験: 成功。', 'ここには余白があります。', 'いい感じです。', 'エージェントは考え中です。']; somethingMessage.textContent = messages[Math.floor(Math.random() * messages.length)]; });
     function renderChaos() { chaosValue.textContent = state.chaos; }
+    function launchChaosStorm(storm) { document.body.classList.remove('chaos-shaking'); void document.body.offsetWidth; document.body.classList.add('chaos-shaking'); for (let index = 0; index < 36; index += 1) { const spark = document.createElement('span'); spark.className = 'chaos-spark'; spark.textContent = [storm, '🌀', '⚡', '🌈', '🧨', '👁'][index % 6]; spark.style.left = `${Math.random() * 100}%`; spark.style.animationDelay = `${Math.random() * 280}ms`; spark.addEventListener('animationend', () => spark.remove()); chaosStorm.append(spark); } }
     chaosButton.addEventListener('click', async () => { const response = await fetch('/api/chaos', { method: 'POST', headers: { authorization: `Bearer ${state.token || ''}` } }); const result = await response.json(); if (!response.ok) return status.textContent = result.error; state.chaos = result.chaos; renderChaos(); });
     const status = document.querySelector('#status');
     const comments = document.querySelector('#comments');
@@ -92,7 +99,7 @@
     async function restoreSession() { if (!state.token) return; const response = await fetch('/api/me', { headers: { authorization: `Bearer ${state.token}` } }); if (!response.ok) { state.token = null; localStorage.removeItem('token'); return; } setUser((await response.json()).user); }
     document.querySelector('#comment-form').addEventListener('submit', async (event) => { event.preventDefault(); const form = new FormData(event.currentTarget); const response = await fetch('/api/comments', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${state.token || ''}` }, body: JSON.stringify(Object.fromEntries(form)) }); const result = await response.json(); if (!response.ok) return status.textContent = result.error; event.currentTarget.reset(); });
     comments.addEventListener('click', (event) => { const button = event.target.closest('[data-reply]'); if (button) document.querySelector('[name="parentId"]').value = button.dataset.reply; });
-    const events = new EventSource('/api/comments/stream'); events.addEventListener('comment', (event) => { state.comments.unshift(JSON.parse(event.data)); render(); }); events.addEventListener('chaos', (event) => { state.chaos = JSON.parse(event.data).chaos; renderChaos(); }); load(); render(); renderChaos(); restoreSession();
+    const events = new EventSource('/api/comments/stream'); events.addEventListener('comment', (event) => { state.comments.unshift(JSON.parse(event.data)); render(); }); events.addEventListener('chaos', (event) => { const update = JSON.parse(event.data); state.chaos = update.chaos; renderChaos(); launchChaosStorm(update.storm); }); load(); render(); renderChaos(); restoreSession();
   </script>
 </body>
 </html>

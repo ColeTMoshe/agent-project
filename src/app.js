@@ -128,8 +128,8 @@ function broadcast(comment) {
   for (const response of streams) response.write(message);
 }
 
-function broadcastChaos() {
-  const message = `event: chaos\ndata: ${JSON.stringify({ chaos: data.chaos })}\n\n`;
+function broadcastChaos(storm) {
+  const message = `event: chaos\ndata: ${JSON.stringify({ chaos: data.chaos, storm })}\n\n`;
   for (const response of streams) response.write(message);
 }
 
@@ -212,8 +212,9 @@ function createApp() {
         if (!authenticatedUser(request)) return sendJson(response, 401, { error: '混沌を増やすにはログインしてください。' });
         data.chaos += 1;
         saveData();
-        broadcastChaos();
-        return sendJson(response, 200, { chaos: data.chaos });
+        const storm = ['🌀', '⚡', '🌈', '🧨', '👁'][Math.floor(Math.random() * 5)];
+        broadcastChaos(storm);
+        return sendJson(response, 200, { chaos: data.chaos, storm });
       }
 
       if (url.pathname === '/api/comments' && request.method === 'POST') {
