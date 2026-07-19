@@ -38,6 +38,7 @@ The tunnel route points to `http://localhost:8787`. Do not replace or delete the
 - Live click updates through WebSockets at `/ws`.
 - Green Clicker interface and milestone rewards at 10, 50, and 100 clicks.
 - G. SPAMTON'S GREEN SHOP panel and Birdvirus seagull unlock.
+- A shared Evil Birdvirus boss encounter every 1,000 clicks; any player can throw tomatoes until its shared health reaches zero.
 - A local wizard gnome with click-count-aware passive-aggressive dialogue and tomato throws.
 - Machine-readable health status through `/healthz`.
 

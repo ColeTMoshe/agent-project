@@ -22,6 +22,12 @@
     #shop { background: #07150b; border: 3px dashed #baff70; border-radius: 14px; color: #e8ffe9; margin: 22px auto 0; max-width: 390px; padding: 14px; }
     #shop h2 { color: #baff70; font-size: 1.2rem; margin: 0 0 8px; }
     #bird { font-size: 2rem; margin: 0; }
+    #boss { background: #27080c; border: 4px solid #ff4f5d; box-shadow: 0 0 30px #ff203766; margin: 22px auto; max-width: 390px; padding: 16px; }
+    #boss h2 { color: #ff8a8a; letter-spacing: .08em; margin: 0; }
+    #boss-hp { background: #120305; border: 2px solid #ff8a8a; height: 18px; margin: 12px 0; }
+    #boss-hp > span { background: linear-gradient(90deg, #ff2037, #ffb000); display: block; height: 100%; transition: width 180ms; }
+    #attack { background: #ff4f5d; border: 3px solid #fff; box-shadow: 0 5px 0 #7c111a; color: #180002; cursor: pointer; font: 900 1rem/1 system-ui; padding: 12px 18px; }
+    #attack:disabled { cursor: wait; opacity: .65; }
     .pop { animation: pop 700ms ease-out forwards; color: #fff; font-size: 2rem; font-weight: 900; pointer-events: none; position: fixed; text-shadow: 2px 2px #148c3c; }
     #gnome { bottom: 12px; cursor: pointer; position: fixed; right: 16px; width: 58px; }
     #gnome-line { background: #07150b; border: 2px solid #baff70; border-radius: 10px; bottom: 78px; color: #e8ffe9; font-size: .85rem; font-weight: 700; max-width: 210px; padding: 8px 10px; position: fixed; right: 16px; }
@@ -39,6 +45,7 @@
     <p id="cps">0 clicks/sec</p>
     <section id="rewards" aria-label="Milestone rewards"><span class="reward" data-milestone="10">10: Greenhorn</span><span class="reward" data-milestone="50">50: Birdvirus</span><span class="reward" data-milestone="100">100: Big Shot</span></section>
     <section id="shop"><h2>G. SPAMTON'S GREEN SHOP</h2><p>Milestones unlock nonsense.</p><p id="bird" hidden>🕊️ BIRDVIRUS UNLOCKED</p></section>
+    <section id="boss" hidden aria-live="polite"><h2>EVIL BIRDVIRUS #<span id="boss-level">1</span></h2><p>Fear the bird virus.</p><div id="boss-hp" aria-label="Birdvirus health"><span></span></div><p id="boss-copy"></p><button id="attack" type="button">THROW TOMATO</button></section>
     <section id="upgrades"><button data-upgrade="double">Double +1 (15)</button><button data-upgrade="auto">Auto click (50)</button><button data-upgrade="boost">Boost (600)</button></section>
   </main>
   <p id="gnome-line" aria-live="polite">I have seen bigger numbers on a broken calculator.</p>
@@ -51,16 +58,26 @@
     const bird = document.querySelector('#bird');
     const gnome = document.querySelector('#gnome');
     const gnomeLine = document.querySelector('#gnome-line');
+    const boss = document.querySelector('#boss');
+    const bossLevel = document.querySelector('#boss-level');
+    const bossHp = document.querySelector('#boss-hp > span');
+    const bossCopy = document.querySelector('#boss-copy');
+    const attack = document.querySelector('#attack');
     let clicks = 0;
     let lastClicks = 0;
-    function draw() { total.textContent = clicks.toLocaleString('en-US'); document.title = `${clicks.toLocaleString('en-US')} - Green Clicker`; rewards.forEach((reward) => reward.classList.toggle('unlocked', clicks >= Number(reward.dataset.milestone))); bird.hidden = clicks < 50; }
+    let bossState = { activeMilestone: 0, hp: 0, maxHp: 0 };
+    let attacking = false;
+    function draw() { total.textContent = clicks.toLocaleString('en-US'); document.title = `${clicks.toLocaleString('en-US')} - Green Clicker`; rewards.forEach((reward) => reward.classList.toggle('unlocked', clicks >= Number(reward.dataset.milestone))); bird.hidden = clicks < 50; boss.hidden = !bossState.activeMilestone; if (bossState.activeMilestone) { bossLevel.textContent = bossState.activeMilestone; bossHp.style.width = `${Math.max(0, bossState.hp / bossState.maxHp * 100)}%`; bossCopy.textContent = `${bossState.hp} / ${bossState.maxHp} fear points`; attack.disabled = attacking; } }
+    function sync(result) { clicks = result.clicks || 0; bossState = result.boss || bossState; draw(); }
     function pop() { const item = document.createElement('span'); item.className = 'pop'; item.textContent = ['+1', 'GREEN!', 'GO!', '⚡'][Math.floor(Math.random() * 4)]; item.style.left = `${20 + Math.random() * 60}%`; item.style.top = `${35 + Math.random() * 35}%`; item.addEventListener('animationend', () => item.remove()); document.body.append(item); }
     function roast() { const lines = clicks < 10 ? ['That is your number? Ambitious.', 'I have counted more tomatoes than that.', 'Keep going. I am barely judging you.'] : clicks < 50 ? ['Slowly becoming less embarrassing.', 'A respectable warm-up, I suppose.', 'The button is doing most of the work.'] : clicks < 100 ? ['Birdvirus is impressed. I am not.', 'Almost a big shot. Almost.', 'You are clicking with adequate enthusiasm.'] : ['Finally, a number worth throwing tomatoes at.', 'Big number. Tiny ego, please.', 'Not bad. Do not make this a personality.']; gnomeLine.textContent = lines[Math.floor(Math.random() * lines.length)]; }
     gnome.addEventListener('click', () => { const tomato = document.createElement('img'); tomato.className = 'pop'; tomato.src = '/tomato.svg'; tomato.alt = ''; tomato.style.left = '82%'; tomato.style.top = '78%'; tomato.addEventListener('animationend', () => tomato.remove()); document.body.append(tomato); roast(); });
-    clicker.addEventListener('click', async () => { const response = await fetch('/api/clicker', { method: 'POST' }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; clicks = result.clicks; draw(); pop(); roast(); });
-    document.querySelector('#upgrades').addEventListener('click', async (event) => { const type = event.target.dataset.upgrade; if (!type) return; const response = await fetch('/api/clicker/upgrade', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ type }) }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; clicks = result.clicks; draw(); });
-    fetch('/api/clicker').then((response) => response.json()).then((result) => { clicks = result.clicks || 0; draw(); });
-    const socket = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`); socket.addEventListener('message', (event) => { const update = JSON.parse(event.data); if (update.type === 'clicks') { clicks = update.clicks; draw(); feed.textContent = 'Someone clicked the world.'; } });
+    clicker.addEventListener('click', async () => { const response = await fetch('/api/clicker', { method: 'POST' }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; sync(result); pop(); roast(); });
+    attack.addEventListener('click', async () => { if (attacking) return; attacking = true; draw(); const response = await fetch('/api/clicker/boss', { method: 'POST' }); const result = await response.json(); attacking = false; if (!response.ok) return feed.textContent = result.error; sync(result); pop(); feed.textContent = result.boss.activeMilestone ? 'Birdvirus screeches.' : 'Birdvirus fled the clicker.'; });
+    document.querySelector('#upgrades').addEventListener('click', async (event) => { const type = event.target.dataset.upgrade; if (!type) return; const response = await fetch('/api/clicker/upgrade', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ type }) }); const result = await response.json(); if (!response.ok) return feed.textContent = result.error; sync(result); });
+    fetch('/api/clicker').then((response) => response.json()).then(sync);
+    function connect() { const socket = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`); socket.addEventListener('message', (event) => { const update = JSON.parse(event.data); if (update.type === 'clicks') { sync(update); feed.textContent = 'Someone clicked the world.'; } }); socket.addEventListener('close', () => setTimeout(connect, 1_000)); }
+    connect();
     setInterval(() => { document.querySelector('#cps').textContent = `${clicks - lastClicks} clicks/sec`; lastClicks = clicks; }, 1000);
     document.addEventListener('keydown', (event) => { if (event.key.toLowerCase() === 'c' && !event.repeat && document.activeElement === document.body) clicker.click(); });
   </script>

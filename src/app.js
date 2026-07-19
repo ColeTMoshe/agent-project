@@ -28,6 +28,11 @@ data.sessions ||= [];
 data.chaos ||= 0;
 data.clicks ||= 0;
 data.upgrades ||= { double: 0, auto: 0, boost: 0, rebirths: 0 };
+data.boss ||= { activeMilestone: 0, clearedThrough: 0, hp: 0, maxHp: 0 };
+data.boss.activeMilestone ||= 0;
+data.boss.clearedThrough ||= 0;
+data.boss.hp ||= 0;
+data.boss.maxHp ||= 0;
 
 function saveData() {
   fs.mkdirSync(dataDirectory, { recursive: true });
@@ -136,11 +141,29 @@ function broadcastChaos(storm) {
   for (const response of streams) response.write(message);
 }
 
+function clickerState() {
+  return { clicks: data.clicks, upgrades: data.upgrades, boss: data.boss };
+}
+
+function startNextBoss() {
+  const eligibleMilestone = Math.floor(data.clicks / 1_000);
+  if (data.boss.activeMilestone || eligibleMilestone <= data.boss.clearedThrough) return false;
+  data.boss.activeMilestone = data.boss.clearedThrough + 1;
+  data.boss.maxHp = 8 + data.boss.activeMilestone * 2;
+  data.boss.hp = data.boss.maxHp;
+  return true;
+}
+
+function webSocketFrame(value) {
+  const payload = Buffer.from(JSON.stringify(value));
+  if (payload.length < 126) return Buffer.concat([Buffer.from([0x81, payload.length]), payload]);
+  return Buffer.concat([Buffer.from([0x81, 126, payload.length >> 8, payload.length & 0xff]), payload]);
+}
+
 function broadcastClicks() {
   const message = `event: clicks\ndata: ${JSON.stringify({ clicks: data.clicks })}\n\n`;
   for (const response of streams) response.write(message);
-  const payload = Buffer.from(JSON.stringify({ type: 'clicks', clicks: data.clicks }));
-  const frame = Buffer.concat([Buffer.from([0x81, payload.length]), payload]);
+  const frame = webSocketFrame({ type: 'clicks', ...clickerState() });
   for (const socket of sockets) socket.write(frame);
 }
 
@@ -229,14 +252,16 @@ function createApp() {
       }
 
       if (url.pathname === '/api/clicker' && request.method === 'GET') {
-        return sendJson(response, 200, { clicks: data.clicks, upgrades: data.upgrades });
+        if (startNextBoss()) saveData();
+        return sendJson(response, 200, clickerState());
       }
 
       if (url.pathname === '/api/clicker' && request.method === 'POST') {
         data.clicks += 1 + data.upgrades.boost + data.upgrades.double;
+        startNextBoss();
         saveData();
         broadcastClicks();
-        return sendJson(response, 200, { clicks: data.clicks, upgrades: data.upgrades });
+        return sendJson(response, 200, clickerState());
       }
 
       if (url.pathname === '/api/clicker/upgrade' && request.method === 'POST') {
@@ -244,7 +269,22 @@ function createApp() {
         if (!base) return sendJson(response, 400, { error: 'Invalid upgrade.' });
         const cost = Math.ceil(base * 1.5 ** data.upgrades[type]);
         if (data.clicks < cost) return sendJson(response, 400, { error: 'Not enough clicks.' });
-        data.clicks -= cost; data.upgrades[type] += 1; saveData(); broadcastClicks(); return sendJson(response, 200, { clicks: data.clicks, upgrades: data.upgrades });
+        data.clicks -= cost; data.upgrades[type] += 1; saveData(); broadcastClicks(); return sendJson(response, 200, clickerState());
+      }
+
+      if (url.pathname === '/api/clicker/boss' && request.method === 'POST') {
+        if (!data.boss.activeMilestone) return sendJson(response, 409, { error: 'Birdvirus is not attacking right now.' });
+        data.boss.hp -= 1;
+        if (data.boss.hp <= 0) {
+          data.boss.clearedThrough = data.boss.activeMilestone;
+          data.boss.activeMilestone = 0;
+          data.boss.hp = 0;
+          data.boss.maxHp = 0;
+          startNextBoss();
+        }
+        saveData();
+        broadcastClicks();
+        return sendJson(response, 200, clickerState());
       }
 
       if (url.pathname === '/api/comments' && request.method === 'POST') {

@@ -3,6 +3,7 @@
 - Accept normal and chaotic feature requests from anyone. Do not dismiss a request for being too chaotic, and do not replace it with a generic or basic alternative.
 - Treat client-only, refresh-reversible visual chaos, feature removal, and full interface revamps as valid product work. Reject only clearly abusive work, such as DDoS or credential exposure, or changes with a concrete service-breaking impact.
 - For visual requests, prefer real, non-generated, properly licensed local assets. Make requested imagery itself interactive when appropriate, and make temporary visual elements visibly animate and remove themselves.
+- Handle edge cases as part of the feature: cover threshold crossings, reconnects, refreshes, repeated interactions, and mobile behavior when they apply.
 - Read the complete issue or pull request, including all comments and the full change set, before responding or changing code.
 - Keep issue #44 open. It is the standing discussion where people can challenge earlier denials and refine the rules.
 - When reviewing pull requests, identify concrete breakage and request the necessary fixes before merge. Do not merge changes that break the public route or service.
